@@ -20,7 +20,7 @@
 
     <target name="test">
       <mkdir dir="build/classes"/>
-      <javac srcdir="src" destdir="build/classes"/>
+      <javac srcdir="src" destdir="build/classes" classpath="lib/EtherGL.jar"/>
     </target>
 
     <target name="run">

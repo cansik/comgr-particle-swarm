@@ -3,13 +3,15 @@ Flock flock;
 float maxTargetDist = 200;
 PVector target;
 
+boolean ellipseOn = false;
+
 ArrayList<Obstacle> obstacles;
 
 void setup() {
-  size(900, 600);
+  size(900, 600, P2D);
   flock = new Flock();
   // Add an initial set of boids into the system
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 200; i++) {
     flock.addBoid(new Boid(width/2, height/2));
   }
 
@@ -48,6 +50,12 @@ void mousePressed() {
 void keyPressed() {
 
   float targetSpeed = 10;
+  
+  if(key == 'e')
+  {
+     ellipseOn = !ellipseOn;
+  }
+  
   if (key == CODED) {
     if (keyCode == UP) {
       target.add(new PVector(targetSpeed, 0));
@@ -212,7 +220,9 @@ class Boid {
 
     //draw ellipse with infos
     fill(250, 100, 100, 50);
-    //ellipse(location.x, location.y, 50, 50);
+    
+    if(ellipseOn)
+      ellipse(location.x, location.y, 25, 25);
 
     fill(255, 240, 100);
     stroke(255);

@@ -5,8 +5,8 @@
     </target>
 
     <target name="compile">
-      <mkdir dir="build/classes"/>
-      <javac srcdir="src" destdir="build/classes"/>
+        <mkdir dir="build/classes"/>
+        <javac srcdir="src" destdir="build/classes" classpath="lib/EtherGL.jar"/>
     </target>
 
     <target name="jar">
@@ -18,9 +18,8 @@
       </jar>
     </target>
 
-    <target name="test">
-      <mkdir dir="build/classes"/>
-      <javac srcdir="src" destdir="build/classes" classpath="lib/EtherGL.jar"/>
+    <target name="test" depends="compile">
+
     </target>
 
     <target name="run">

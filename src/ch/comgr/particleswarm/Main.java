@@ -1,10 +1,11 @@
 package ch.comgr.particleswarm;
 
-import java.awt.*;
+import ch.comgr.particleswarm.simulation.SwarmSimulation;
 
 public class Main {
 
     public static void main(String[] args) {
-        new SimpleCubeExample();
+        SwarmSimulation simulation = new SwarmSimulation();
+        simulation.run();
     }
 }

@@ -17,11 +17,13 @@ public class Particle implements ISimulationObject {
 
     private IMesh mesh;
     private float angle = 0;
+    private float ad = 0;
 
-    public Particle()
+    public Particle(float ad)
     {
-        //mesh = MeshLibrary.createCube();
-        mesh = makeColoredTriangle(1);
+        this.ad = ad;
+        mesh = MeshLibrary.createCube();
+        //mesh = makeColoredTriangle(1);
     }
 
     private static IMesh makeColoredTriangle(float off) {
@@ -43,7 +45,7 @@ public class Particle implements ISimulationObject {
     @Override
     public void update() {
         //rotate mesh
-        angle += 1;
+        angle += ad;
 
         Mat4 transform = Mat4.multiply(Mat4.rotate(angle, Vec3.Z), Mat4.translate(1, 1, 0));
         mesh.setTransform(transform);

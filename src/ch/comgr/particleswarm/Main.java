@@ -1,6 +1,6 @@
 package ch.comgr.particleswarm;
 
-import ch.comgr.particleswarm.simulation.SwarmSimulation;
+import ch.comgr.particleswarm.controller.SwarmSimulation;
 
 public class Main {
 

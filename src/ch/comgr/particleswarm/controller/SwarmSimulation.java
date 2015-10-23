@@ -1,5 +1,7 @@
-package ch.comgr.particleswarm.simulation;
+package ch.comgr.particleswarm.controller;
 
+import ch.comgr.particleswarm.model.ISimulationObject;
+import ch.comgr.particleswarm.model.Particle;
 import ch.fhnw.ether.controller.DefaultController;
 import ch.fhnw.ether.controller.IController;
 import ch.fhnw.ether.controller.event.IKeyEvent;
@@ -104,8 +106,8 @@ public class SwarmSimulation {
         simulationObjects = new ArrayList<>();
     }
 
-    public void run()
-    {
+    public void run() {
+
         //create initial scene
         addSimulationObject(new Particle(1));
         addSimulationObject(new Particle(-1));
@@ -118,6 +120,7 @@ public class SwarmSimulation {
 
             //repaint view
             controller.repaintViews();
+
             return true;
         });
     }
@@ -129,6 +132,9 @@ public class SwarmSimulation {
     private void addSimulationObject(ISimulationObject obj)
     {
         simulationObjects.add(obj);
-        scene.add3DObject(obj.getMesh());
+
+        obj.getMeshes().forEach((iMesh ->
+                scene.add3DObject(iMesh)
+        ));
     }
 }

@@ -11,15 +11,12 @@ import java.util.List;
  * Created by Roger on 23.10.2015.
  */
 public class ObjectLoader {
-    private List<IMesh> addMeshesFromObject(String path) {
-        List<IMesh> meshes = new ArrayList<>();
+    public List<IMesh> getMeshesFromObject(String path) {
         try {
-            new OBJReader(getClass().getResource(path)).getMeshes().forEach((mesh) -> {
-                meshes.add(mesh);
-            });
+            return new OBJReader(getClass().getResource(path)).getMeshes();
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 }

@@ -18,4 +18,23 @@ public class EtherGLUtil {
 
         return v;
     }
+
+    public static boolean equalVec3(Vec3 a, Vec3 b)
+    {
+        return (isFloatingEqual(a.x, b.x)
+                && isFloatingEqual(a.y, b.y)
+                && isFloatingEqual(a.z, b.z));
+    }
+
+    /**
+     * Compare to floats for (almost) equality. Will check whether they are
+     * at most 5 ULP apart.
+     */
+    public static boolean isFloatingEqual(float v1, float v2) {
+        if (v1 == v2)
+            return true;
+        float absoluteDifference = Math.abs(v1 - v2);
+        float maxUlp = Math.max(Math.ulp(v1), Math.ulp(v2));
+        return absoluteDifference < 5 * maxUlp;
+    }
 }

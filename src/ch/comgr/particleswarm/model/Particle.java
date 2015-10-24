@@ -21,10 +21,19 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
 
     private List<IMesh> meshes = new ArrayList<>();
 
-    public Particle()
+    public Particle(Vec3 startPos, String name)
     {
+        super(startPos);
         meshes.add(MeshLibrary.createCube());
+        meshes.get(0).setName(name);
         //getAndAddMeshesFromObj();
+
+        Mat4 transform = Mat4.translate(startPos);
+
+        meshes.forEach((mesh) -> {
+            mesh.setTransform(transform);
+            mesh.requestUpdate(transform);
+        });
     }
 
     private void getAndAddMeshesFromObj() {
@@ -44,7 +53,7 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
         super.nextStep(simulationObjects);
 
         //update meshes
-        Mat4 transform = Mat4.multiply(Mat4.rotate(angle, Vec3.Z), Mat4.translate(velocity));
+        Mat4 transform = Mat4.translate(position); //Mat4.multiply(Mat4.rotate(angle, Vec3.Z), Mat4.translate(velocity));
 
         meshes.forEach((mesh) -> {
             mesh.setTransform(transform);

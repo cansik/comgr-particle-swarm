@@ -7,21 +7,27 @@ import ch.fhnw.util.math.Vec3;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ch.comgr.particleswarm.util.EtherGLUtil.equalVec3;
+
 /**
  * Created by cansik on 24/10/15.
  */
 public abstract class BaseSwarmObject {
 
     //todo: change this default values in the UI
-    private static final float MAX_SPEED = 2.0f;
+    private static final float MAX_SPEED = 1.0f;
     private static final float MAX_FORCE = 0.03f;
 
-    private static final float SPEARATION_WEIGHT = 1.5f;
+    private static final float SEPARATION_WEIGHT = 2.0f;
     private static final float ALIGNMENT_WEIGHT = 1.0f;
     private static final float COHESION_WEIGHT = 1.0f;
 
-    private final float DESIRED_SEPARATION = 25f;
-    private static final float NEIGHBOUR_RADIUS = 50f;
+    private static final float DESIRED_SEPARATION = 5f;
+    private static final float NEIGHBOUR_RADIUS = 10f;
+
+    private static final float BOX_WIDTH = 100f;
+    private static final float BOX_HEIGHT = 100f;
+    private static final float BOX_DEPTH = 100f;
 
     float angle;
     Vec3 position;
@@ -33,16 +39,16 @@ public abstract class BaseSwarmObject {
     /**
      * Creates a new Swarm Object which try's to align to other objects.
      */
-    public BaseSwarmObject()
+    public BaseSwarmObject(Vec3 startPosition)
     {
         //get random spawn angle
         angle = (float)(Math.random()* EtherGLUtil.TWO_PI);
 
         //start from position zero
-        position = Vec3.ZERO;
+        position = startPosition;
 
         //set velocity to initial amount
-        velocity = new Vec3((float)Math.cos(angle), (float)Math.sin(angle), (float)Math.tan(angle));
+        velocity = new Vec3((float)Math.cos(angle), (float)Math.sin(angle), 0);
     }
 
     /**
@@ -68,6 +74,7 @@ public abstract class BaseSwarmObject {
         velocity = EtherGLUtil.limit(velocity, MAX_SPEED);
 
         position = position.add(velocity);
+        checkBorders();
     }
 
     /**
@@ -82,7 +89,7 @@ public abstract class BaseSwarmObject {
         Vec3 cohesion = calculateCohesion();
 
         //weight the forces
-        separation = separation.scale(SPEARATION_WEIGHT);
+        separation = separation.scale(SEPARATION_WEIGHT);
         alignment = alignment.scale(ALIGNMENT_WEIGHT);
         cohesion = cohesion.scale(COHESION_WEIGHT);
 
@@ -93,6 +100,25 @@ public abstract class BaseSwarmObject {
         acceleration = applyForce(acceleration, cohesion);
 
         return acceleration;
+    }
+
+    void checkBorders() {
+        //rand_abstand
+        float r = 0f;
+
+        float x = position.x;
+        float y = position.y;
+        float z = position.z;
+
+        if (x < -r) x = BOX_WIDTH+r;
+        if (y < -r) y = BOX_HEIGHT+r;
+        if (z < -r) z = BOX_DEPTH+r;
+
+        if (x > BOX_WIDTH+r) x = -r;
+        if (y > BOX_HEIGHT+r) y = -r;
+        if (z > BOX_DEPTH+r) z = -r;
+
+        position = new Vec3(x, y, z);
     }
 
     /**
@@ -143,13 +169,18 @@ public abstract class BaseSwarmObject {
             if(n.getSecond() > DESIRED_SEPARATION)
                 continue;
 
+            //todo: get diff from neighbours list
             Vec3 diff = position.subtract(n.getFirst().position);
 
             //weight by distance
+            //todo: double normalize here?!
             diff = diff.normalize().scale(1/n.getSecond());
             direction = direction.add(diff);
             neighbourCount++;
         }
+
+        if(neighbourCount == 0)
+            return direction;
 
         direction = direction.scale(1/neighbourCount)
                 .normalize()
@@ -233,6 +264,11 @@ public abstract class BaseSwarmObject {
 
         BaseSwarmObject bso = (BaseSwarmObject)obj;
 
-        return bso.position.equals(this.position) && bso.velocity.equals(this.velocity);
+        boolean res = bso.position.equals(this.position) && bso.velocity.equals(this.velocity);
+        boolean res2 = equalVec3(bso.position, position) && equalVec3(bso.velocity, velocity);
+
+        assert res == res2;
+
+        return res2;
     }
 }

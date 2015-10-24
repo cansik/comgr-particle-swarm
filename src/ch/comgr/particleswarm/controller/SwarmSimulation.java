@@ -23,6 +23,8 @@ import java.util.Collections;
 public class SwarmSimulation {
     /************** Config-Variables ***************/
 
+    // simulation loop interval
+    private static final double LOOP_INTERVAL = 1.0/60.0;
     // camera location increments
     private static final float INC_XY = 0.25f;
     private static final float INC_Z = 0.25f;
@@ -82,6 +84,13 @@ public class SwarmSimulation {
                     case IKeyEvent.VK_H:
                         printHelp(HELP);
                         break;
+                    case IKeyEvent.VK_SPACE:
+                        System.out.println("Next Frame");
+                        //update simulation logic for each element
+                        update();
+                        //repaint view
+                        controller.repaintViews();
+                        break;
                     default:
                         super.keyPressed(e);
                 }
@@ -110,11 +119,22 @@ public class SwarmSimulation {
     public void run() {
 
         //create initial scene
-        addSimulationObject(new Particle());
-        addSimulationObject(new Particle());
+        addSimulationObject(new Particle(new Vec3(5, 0, 0), "First"));
+        addSimulationObject(new Particle(new Vec3(0, 5, 2), "Second"));
+        addSimulationObject(new Particle(new Vec3(20, 1, 0), "Third"));
+        addSimulationObject(new Particle(new Vec3(10, 2, 0), "Fourth"));
+
+        for(int i = 0; i < 200; i++)
+        {
+            float x = (float)Math.floor(Math.random() * 100) + 1;
+            float y = (float)Math.floor(Math.random() * 100) + 1;
+            float z = (float)Math.floor(Math.random() * 100) + 1;
+
+            addSimulationObject(new Particle(new Vec3(x, y, z), "Gen("+x+":"+y+":"+z));
+        }
 
         //main simulation loop
-        controller.getScheduler().repeat(0, 1.0/60.0, (time, interval) -> {
+        controller.getScheduler().repeat(0, LOOP_INTERVAL, (time, interval) -> {
 
             //update simulation logic for each element
             update();
@@ -127,7 +147,7 @@ public class SwarmSimulation {
     }
 
     private void update() {
-        simulationObjects.parallelStream().forEach(o -> o.update(Collections.unmodifiableList(simulationObjects)));
+        simulationObjects.stream().forEach(o -> o.update(Collections.unmodifiableList(simulationObjects)));
     }
 
     private void addSimulationObject(ISimulationObject obj)

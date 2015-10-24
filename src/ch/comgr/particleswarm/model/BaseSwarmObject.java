@@ -15,19 +15,19 @@ import static ch.comgr.particleswarm.util.EtherGLUtil.equalVec3;
 public abstract class BaseSwarmObject {
 
     //todo: change this default values in the UI
-    private static final float MAX_SPEED = 1.0f;
+    private static final float MAX_SPEED = 0.5f;
     private static final float MAX_FORCE = 0.03f;
 
-    private static final float SEPARATION_WEIGHT = 2.0f;
+    private static final float SEPARATION_WEIGHT = 1.5f;
     private static final float ALIGNMENT_WEIGHT = 1.0f;
     private static final float COHESION_WEIGHT = 1.0f;
 
     private static final float DESIRED_SEPARATION = 5f;
-    private static final float NEIGHBOUR_RADIUS = 10f;
+    private static final float NEIGHBOUR_RADIUS = 15f;
 
-    private static final float BOX_WIDTH = 100f;
-    private static final float BOX_HEIGHT = 100f;
-    private static final float BOX_DEPTH = 100f;
+    private static final float BOX_WIDTH = 100;
+    private static final float BOX_HEIGHT = 100;
+    private static final float BOX_DEPTH = 100;
 
     float angle;
     Vec3 position;
@@ -48,7 +48,7 @@ public abstract class BaseSwarmObject {
         position = startPosition;
 
         //set velocity to initial amount
-        velocity = new Vec3((float)Math.cos(angle), (float)Math.sin(angle), 0);
+        velocity = EtherGLUtil.randomVec3();
     }
 
     /**
@@ -57,7 +57,7 @@ public abstract class BaseSwarmObject {
      */
     public void nextStep(List<ISimulationObject> simulationObjects)
     {
-        //todo: check if lambda is fast!
+        //todo: check if lambda is fast enough!
         //get swarm
         swarm = simulationObjects.stream()
                 .map(so -> (so instanceof BaseSwarmObject) ? (BaseSwarmObject) so : null).filter(bso -> bso != null)
@@ -102,6 +102,9 @@ public abstract class BaseSwarmObject {
         return acceleration;
     }
 
+    /**
+     * Checks if object is out of bounds and puts in on the other side of the box.
+     */
     void checkBorders() {
         //rand_abstand
         float r = 0f;
@@ -120,7 +123,6 @@ public abstract class BaseSwarmObject {
 
         position = new Vec3(x, y, z);
     }
-
     /**
      * Applies force to a given acceleration.
      * @param acceleration Given acceleration
@@ -141,10 +143,9 @@ public abstract class BaseSwarmObject {
     Vec3 getSteerToTargetForce(Vec3 target)
     {
         Vec3 desired = target.subtract(position);
-        float distance = position.distance(target);
 
         desired = desired.normalize();
-        desired = desired.scale(MAX_SPEED * (distance / 100));
+        desired = desired.scale(MAX_SPEED);
 
         Vec3 steer = desired.subtract(velocity);
         steer = EtherGLUtil.limit(steer, MAX_FORCE);
@@ -169,12 +170,12 @@ public abstract class BaseSwarmObject {
             if(n.getSecond() > DESIRED_SEPARATION)
                 continue;
 
-            //todo: get diff from neighbours list
             Vec3 diff = position.subtract(n.getFirst().position);
 
+            diff = diff.normalize();
             //weight by distance
-            //todo: double normalize here?!
-            diff = diff.normalize().scale(1/n.getSecond());
+            diff = diff.scale(1.0f/n.getSecond());
+
             direction = direction.add(diff);
             neighbourCount++;
         }
@@ -182,12 +183,14 @@ public abstract class BaseSwarmObject {
         if(neighbourCount == 0)
             return direction;
 
-        direction = direction.scale(1/neighbourCount)
-                .normalize()
-                .scale(MAX_SPEED)
-                .subtract(velocity);
+        if(direction.length() > 0) {
+            direction = direction.scale(1.0f / neighbourCount)
+                    .normalize()
+                    .scale(MAX_SPEED)
+                    .subtract(velocity);
 
-        direction = EtherGLUtil.limit(direction, MAX_FORCE);
+            direction = EtherGLUtil.limit(direction, MAX_FORCE);
+        }
         return direction;
     }
 
@@ -205,7 +208,7 @@ public abstract class BaseSwarmObject {
         for(Tuple<BaseSwarmObject, Float> n : neighbours)
             direction = direction.add(n.getFirst().velocity);
 
-        direction = direction.scale(1/neighbours.size())
+        direction = direction.scale(1.0f/neighbours.size())
                 .normalize()
                 .scale(MAX_SPEED)
                 .subtract(velocity);
@@ -229,7 +232,7 @@ public abstract class BaseSwarmObject {
         for(Tuple<BaseSwarmObject, Float> n : neighbours)
             direction = direction.add(n.getFirst().position);
 
-        direction = direction.scale(1/neighbours.size());
+        direction = direction.scale(1.0f/neighbours.size());
         return getSteerToTargetForce(direction);
     }
 
@@ -254,7 +257,7 @@ public abstract class BaseSwarmObject {
      */
     public float getDistanceTo(BaseSwarmObject bso)
     {
-        return position.distance(bso.position);
+        return Math.abs(position.distance(bso.position));
     }
 
     @Override

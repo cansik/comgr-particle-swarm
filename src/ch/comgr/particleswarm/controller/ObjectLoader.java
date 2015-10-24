@@ -11,6 +11,11 @@ import java.util.List;
  * Created by Roger on 23.10.2015.
  */
 public class ObjectLoader {
+    /**
+     * Loads all meshes from an object file.
+     * @param path Path to the object file
+     * @return List of meshes of the object file
+     */
     public List<IMesh> getMeshesFromObject(String path) {
         try {
             return new OBJReader(getClass().getResource(path)).getMeshes();

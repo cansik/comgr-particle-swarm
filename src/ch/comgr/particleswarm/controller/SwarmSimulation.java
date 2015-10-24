@@ -2,6 +2,7 @@ package ch.comgr.particleswarm.controller;
 
 import ch.comgr.particleswarm.model.ISimulationObject;
 import ch.comgr.particleswarm.model.Particle;
+import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.fhnw.ether.controller.DefaultController;
 import ch.fhnw.ether.controller.IController;
 import ch.fhnw.ether.controller.event.IKeyEvent;
@@ -84,13 +85,6 @@ public class SwarmSimulation {
                     case IKeyEvent.VK_H:
                         printHelp(HELP);
                         break;
-                    case IKeyEvent.VK_SPACE:
-                        System.out.println("Next Frame");
-                        //update simulation logic for each element
-                        update();
-                        //repaint view
-                        controller.repaintViews();
-                        break;
                     default:
                         super.keyPressed(e);
                 }
@@ -116,21 +110,17 @@ public class SwarmSimulation {
         simulationObjects = new ArrayList<>();
     }
 
+    /**
+     * Initialises the simulation and starts the simulation loop.
+     */
     public void run() {
 
         //create initial scene
-        addSimulationObject(new Particle(new Vec3(5, 0, 0), "First"));
-        addSimulationObject(new Particle(new Vec3(0, 5, 2), "Second"));
-        addSimulationObject(new Particle(new Vec3(20, 1, 0), "Third"));
-        addSimulationObject(new Particle(new Vec3(10, 2, 0), "Fourth"));
-
-        for(int i = 0; i < 200; i++)
+        for(int i = 0; i < 25; i++)
         {
-            float x = (float)Math.floor(Math.random() * 100) + 1;
-            float y = (float)Math.floor(Math.random() * 100) + 1;
-            float z = (float)Math.floor(Math.random() * 100) + 1;
-
-            addSimulationObject(new Particle(new Vec3(x, y, z), "Gen("+x+":"+y+":"+z));
+            //start at 50, 50, 50
+            Vec3 distr = EtherGLUtil.randomVec3().scale(5f);
+            addSimulationObject(new Particle(distr.add(new Vec3(50, 50, 50)), "Gen (" + i + ")"));
         }
 
         //main simulation loop
@@ -146,10 +136,17 @@ public class SwarmSimulation {
         });
     }
 
+    /**
+     * Updates all simulation objects.
+     */
     private void update() {
         simulationObjects.stream().forEach(o -> o.update(Collections.unmodifiableList(simulationObjects)));
     }
 
+    /**
+     * Adds a new simulation object to the simulation.
+     * @param obj Object to add
+     */
     private void addSimulationObject(ISimulationObject obj)
     {
         simulationObjects.add(obj);

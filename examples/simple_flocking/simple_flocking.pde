@@ -135,10 +135,11 @@ class Boid {
     // velocity = PVector.random2D();
 
     // Leaving the code temporarily this way so that this example runs in JS
-    float angle = random(TWO_PI);
+    float angle = random(TWO_PI); //<>//
     velocity = new PVector(cos(angle), sin(angle));
+    System.out.println("A:" + angle + "V: "+ velocity);
 
-    location = new PVector(x, y);
+    location = new PVector(x, y); //<>//
     r = 2.0;
     maxspeed = 2;
     maxforce = 0.03;
@@ -158,9 +159,9 @@ class Boid {
 
   // We accumulate a new acceleration each time based on three rules
   void flock(ArrayList<Boid> boids, ArrayList<Obstacle> obstacles) {
-    PVector sep = separate(boids);   // Separation
-    PVector ali = align(boids);      // Alignment
-    PVector coh = cohesion(boids);   // Cohesion
+    PVector sep =  new PVector(); //separate(boids);   // Separation
+    PVector ali =new PVector(); //align(boids);      // Alignment
+    PVector coh = new PVector(); //cohesion(boids);   // Cohesion
 
     PVector rep = repulsion(obstacles); // Repulsion
 
@@ -289,6 +290,7 @@ class Boid {
         // Calculate vector pointing away from neighbor
         PVector diff = PVector.sub(location, other.location);
         diff.normalize();
+        diff.mult(d);
         diff.div(d);        // Weight by distance
         steer.add(diff);
         count++;            // Keep track of how many

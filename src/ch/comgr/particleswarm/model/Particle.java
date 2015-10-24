@@ -20,12 +20,9 @@ import java.util.List;
 public class Particle extends BaseSwarmObject {
 
     private List<IMesh> meshes = new ArrayList<>();
-    private float ad = 0;
 
-    public Particle(float ad)
+    public Particle()
     {
-        this.ad = ad;
-
         meshes.add(MeshLibrary.createCube());
         //getAndAddMeshesFromObj();
     }
@@ -46,10 +43,8 @@ public class Particle extends BaseSwarmObject {
     public void update(List<ISimulationObject> simulationObjects) {
         super.update(simulationObjects);
 
-        //rotate mesh
-        angle += ad;
-
-        Mat4 transform = Mat4.multiply(Mat4.rotate(angle, Vec3.Z), Mat4.translate(1, 1, 0));
+        //update meshes
+        Mat4 transform = Mat4.multiply(Mat4.rotate(angle, Vec3.Z), Mat4.translate(velocity));
 
         meshes.forEach((mesh) -> {
             mesh.setTransform(transform);

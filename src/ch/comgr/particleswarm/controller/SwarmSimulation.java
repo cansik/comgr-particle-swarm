@@ -110,8 +110,8 @@ public class SwarmSimulation {
     public void run() {
 
         //create initial scene
-        addSimulationObject(new Particle(1));
-        addSimulationObject(new Particle(-1));
+        addSimulationObject(new Particle());
+        addSimulationObject(new Particle());
 
         //main simulation loop
         controller.getScheduler().repeat(0, 1.0/60.0, (time, interval) -> {

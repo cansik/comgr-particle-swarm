@@ -42,6 +42,8 @@ public abstract class BaseSwarmObject implements ISimulationObject {
         //apply acceleration to velocity and update position
         velocity = velocity.add(acceleration);
         velocity = EtherGLUtil.limit(velocity, MAX_SPEED);
+
+        position = position.add(velocity);
     }
 
     Vec3 calculateAcceleration(List<ISimulationObject> simulationObjects)

@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Created by cansik on 20/10/15.
  */
-public class Particle extends BaseSwarmObject {
+public class Particle extends BaseSwarmObject implements ISimulationObject {
 
     private List<IMesh> meshes = new ArrayList<>();
 
@@ -41,7 +41,7 @@ public class Particle extends BaseSwarmObject {
 
     @Override
     public void update(List<ISimulationObject> simulationObjects) {
-        super.update(simulationObjects);
+        super.nextStep(simulationObjects);
 
         //update meshes
         Mat4 transform = Mat4.multiply(Mat4.rotate(angle, Vec3.Z), Mat4.translate(velocity));

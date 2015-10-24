@@ -11,6 +11,7 @@ public interface ISimulationObject {
 
     List<IMesh> getMeshes();
 
-    void update();
+    //todo: pass a wrapper object to store more information (parameter..)
+    void update(List<ISimulationObject> simulationObjects);
 
 }

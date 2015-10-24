@@ -17,19 +17,17 @@ import java.util.List;
 /**
  * Created by cansik on 20/10/15.
  */
-public class Particle implements ISimulationObject {
+public class Particle extends BaseSwarmObject {
 
     private List<IMesh> meshes = new ArrayList<>();
-    private float angle = 0;
     private float ad = 0;
 
     public Particle(float ad)
     {
         this.ad = ad;
 
-        //meshes.add(MeshLibrary.createCube());
-        //meshes.add(makeColoredTriangle(1));
-        getAndAddMeshesFromObj();
+        meshes.add(MeshLibrary.createCube());
+        //getAndAddMeshesFromObj();
     }
 
     private void getAndAddMeshesFromObj() {
@@ -45,7 +43,9 @@ public class Particle implements ISimulationObject {
     }
 
     @Override
-    public void update() {
+    public void update(List<ISimulationObject> simulationObjects) {
+        super.update(simulationObjects);
+
         //rotate mesh
         angle += ad;
 
@@ -55,16 +55,5 @@ public class Particle implements ISimulationObject {
             mesh.setTransform(transform);
             mesh.requestUpdate(transform);
         });
-    }
-
-    private static IMesh makeColoredTriangle(float off) {
-        float[] vertices = { off + 0, 0,
-                off + 0, 0,
-                off + 0, 0.5f,
-                off + 0.5f, 0, 0.5f };
-        float[] colors = { 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1 };
-
-        DefaultGeometry g = DefaultGeometry.createVC(IGeometry.Primitive.TRIANGLES, vertices, colors);
-        return new DefaultMesh(new ColorMaterial(RGBA.WHITE, true), g, IMesh.Queue.DEPTH);
     }
 }

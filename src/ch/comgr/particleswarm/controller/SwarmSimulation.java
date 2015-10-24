@@ -15,6 +15,7 @@ import ch.fhnw.util.math.Vec3;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by cansik on 20/10/15.
@@ -126,7 +127,7 @@ public class SwarmSimulation {
     }
 
     private void update() {
-        simulationObjects.parallelStream().forEach(ISimulationObject::update);
+        simulationObjects.parallelStream().forEach(o -> o.update(Collections.unmodifiableList(simulationObjects)));
     }
 
     private void addSimulationObject(ISimulationObject obj)

@@ -23,7 +23,7 @@ public abstract class BaseSwarmObject {
     private static final float COHESION_WEIGHT = 1.0f;
 
     private static final float DESIRED_SEPARATION = 5f;
-    private static final float NEIGHBOUR_RADIUS = 15f;
+    public static final float NEIGHBOUR_RADIUS = 15f;
 
     private static final float BOX_WIDTH = 100;
     private static final float BOX_HEIGHT = 100;
@@ -39,10 +39,9 @@ public abstract class BaseSwarmObject {
     /**
      * Creates a new Swarm Object which try's to align to other objects.
      */
-    public BaseSwarmObject(Vec3 startPosition)
-    {
+    public BaseSwarmObject(Vec3 startPosition) {
         //get random spawn angle
-        angle = (float)(Math.random()* EtherGLUtil.TWO_PI);
+        angle = (float) (Math.random() * EtherGLUtil.TWO_PI);
 
         //start from position zero
         position = startPosition;
@@ -53,10 +52,10 @@ public abstract class BaseSwarmObject {
 
     /**
      * Performs next step for this Swarm Object and updates position and velocity.
+     *
      * @param simulationObjects List of objects in the simulation
      */
-    public void nextStep(List<ISimulationObject> simulationObjects)
-    {
+    public void nextStep(List<ISimulationObject> simulationObjects) {
         //todo: check if lambda is fast enough!
         //get swarm
         swarm = simulationObjects.stream()
@@ -79,10 +78,10 @@ public abstract class BaseSwarmObject {
 
     /**
      * Calculates the acceleration for this cycle.
+     *
      * @return Current acceleration
      */
-    Vec3 calculateAcceleration()
-    {
+    Vec3 calculateAcceleration() {
         //calculate forces
         Vec3 separation = calculateSeparation();
         Vec3 alignment = calculateAlignment();
@@ -113,35 +112,36 @@ public abstract class BaseSwarmObject {
         float y = position.y;
         float z = position.z;
 
-        if (x < -r) x = BOX_WIDTH+r;
-        if (y < -r) y = BOX_HEIGHT+r;
-        if (z < -r) z = BOX_DEPTH+r;
+        if (x < -r) x = BOX_WIDTH + r;
+        if (y < -r) y = BOX_HEIGHT + r;
+        if (z < -r) z = BOX_DEPTH + r;
 
-        if (x > BOX_WIDTH+r) x = -r;
-        if (y > BOX_HEIGHT+r) y = -r;
-        if (z > BOX_DEPTH+r) z = -r;
+        if (x > BOX_WIDTH + r) x = -r;
+        if (y > BOX_HEIGHT + r) y = -r;
+        if (z > BOX_DEPTH + r) z = -r;
 
         position = new Vec3(x, y, z);
     }
+
     /**
      * Applies force to a given acceleration.
+     *
      * @param acceleration Given acceleration
-     * @param force Force to add
+     * @param force        Force to add
      * @return Acceleration with force
      */
-    Vec3 applyForce(Vec3 acceleration, Vec3 force)
-    {
+    Vec3 applyForce(Vec3 acceleration, Vec3 force) {
         //todo: add mass here (A = F / M)
         return acceleration.add(force);
     }
 
     /**
      * Calculates the force to steer to a target location.
+     *
      * @param target Location where to steer at
      * @return Force to target location
      */
-    Vec3 getSteerToTargetForce(Vec3 target)
-    {
+    Vec3 getSteerToTargetForce(Vec3 target) {
         Vec3 desired = target.subtract(position);
 
         desired = desired.normalize();
@@ -155,35 +155,35 @@ public abstract class BaseSwarmObject {
 
     /**
      * Calculates the avoidens location for the current Swarm Object.
+     *
      * @return Force to the avoidens location
      */
-    Vec3 calculateSeparation()
-    {
+    Vec3 calculateSeparation() {
         Vec3 direction = Vec3.ZERO;
 
-        if(neighbours.size() == 0)
+        if (neighbours.size() == 0)
             return direction;
 
         int neighbourCount = 0;
 
-        for(Tuple<BaseSwarmObject, Float> n : neighbours) {
-            if(n.getSecond() > DESIRED_SEPARATION)
+        for (Tuple<BaseSwarmObject, Float> n : neighbours) {
+            if (n.getSecond() > DESIRED_SEPARATION)
                 continue;
 
             Vec3 diff = position.subtract(n.getFirst().position);
 
             diff = diff.normalize();
             //weight by distance
-            diff = diff.scale(1.0f/n.getSecond());
+            diff = diff.scale(1.0f / n.getSecond());
 
             direction = direction.add(diff);
             neighbourCount++;
         }
 
-        if(neighbourCount == 0)
+        if (neighbourCount == 0)
             return direction;
 
-        if(direction.length() > 0) {
+        if (direction.length() > 0) {
             direction = direction.scale(1.0f / neighbourCount)
                     .normalize()
                     .scale(MAX_SPEED)
@@ -196,19 +196,19 @@ public abstract class BaseSwarmObject {
 
     /**
      * Calculates the average velocity of all neighbours.
+     *
      * @return Average velocity of all neighbours
      */
-    Vec3 calculateAlignment()
-    {
+    Vec3 calculateAlignment() {
         Vec3 direction = Vec3.ZERO;
 
-        if(neighbours.size() == 0)
+        if (neighbours.size() == 0)
             return direction;
 
-        for(Tuple<BaseSwarmObject, Float> n : neighbours)
+        for (Tuple<BaseSwarmObject, Float> n : neighbours)
             direction = direction.add(n.getFirst().velocity);
 
-        direction = direction.scale(1.0f/neighbours.size())
+        direction = direction.scale(1.0f / neighbours.size())
                 .normalize()
                 .scale(MAX_SPEED)
                 .subtract(velocity);
@@ -220,29 +220,29 @@ public abstract class BaseSwarmObject {
 
     /**
      * Calculates the average position of all neighbours.
+     *
      * @return Force to the average position of all neighbours
      */
-    Vec3 calculateCohesion()
-    {
+    Vec3 calculateCohesion() {
         Vec3 direction = Vec3.ZERO;
 
-        if(neighbours.size() == 0)
+        if (neighbours.size() == 0)
             return direction;
 
-        for(Tuple<BaseSwarmObject, Float> n : neighbours)
+        for (Tuple<BaseSwarmObject, Float> n : neighbours)
             direction = direction.add(n.getFirst().position);
 
-        direction = direction.scale(1.0f/neighbours.size());
+        direction = direction.scale(1.0f / neighbours.size());
         return getSteerToTargetForce(direction);
     }
 
     /**
      * Returns the BaseSwarmObjects in the near
+     *
      * @param maximalDistance Maximum Distnace BaseSwarmObject <= will be returned
      * @return List of tupel with BaseSwarmObject and distance
      */
-    public List<Tuple<BaseSwarmObject, Float>> getNeighbours(float maximalDistance)
-    {
+    public List<Tuple<BaseSwarmObject, Float>> getNeighbours(float maximalDistance) {
         return swarm.stream()
                 .filter(b -> !b.equals(this))
                 .map(b -> new Tuple<>(b, b.getDistanceTo(this)))
@@ -252,20 +252,20 @@ public abstract class BaseSwarmObject {
 
     /**
      * Returns the distance to the other BaseSwarmObject
+     *
      * @param bso To measure the distance
      * @return Distnace to the other BaseSwarmObject
      */
-    public float getDistanceTo(BaseSwarmObject bso)
-    {
+    public float getDistanceTo(BaseSwarmObject bso) {
         return Math.abs(position.distance(bso.position));
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof BaseSwarmObject))
+        if (!(obj instanceof BaseSwarmObject))
             return false;
 
-        BaseSwarmObject bso = (BaseSwarmObject)obj;
+        BaseSwarmObject bso = (BaseSwarmObject) obj;
 
         boolean res = bso.position.equals(this.position) && bso.velocity.equals(this.velocity);
         boolean res2 = equalVec3(bso.position, position) && equalVec3(bso.velocity, velocity);

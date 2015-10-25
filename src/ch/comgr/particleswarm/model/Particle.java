@@ -1,6 +1,7 @@
 package ch.comgr.particleswarm.model;
 
 import ch.comgr.particleswarm.controller.ObjectLoader;
+import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.fhnw.ether.scene.mesh.DefaultMesh;
 import ch.fhnw.ether.scene.mesh.IMesh;
 import ch.fhnw.ether.scene.mesh.MeshLibrary;
@@ -22,12 +23,18 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
 
     private List<IMesh> meshes = new ArrayList<>();
 
-    public Particle(Vec3 startPos, String name)
-    {
+    public Particle(Vec3 startPos, String name) {
         super(startPos);
 
-        meshes.add(MeshLibrary.createCube());
-                meshes.get(0).setName(name);
+        //cube mash
+        //meshes.add(MeshLibrary.createCube());
+
+        //add sphere mash instead of cube
+        meshes.add(EtherGLUtil.createSphere(1));
+
+        //set name
+        meshes.get(0).setName(name);
+
         //getAndAddMeshesFromObj();
 
         setPosition(startPos);
@@ -45,10 +52,10 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
 
     /**
      * Sets the position of all meshes to the given position.
+     *
      * @param pos Target position
      */
-    private void setPosition(Vec3 pos)
-    {
+    private void setPosition(Vec3 pos) {
         //todo: add object rotation
         Mat4 transform = Mat4.translate(pos);
 

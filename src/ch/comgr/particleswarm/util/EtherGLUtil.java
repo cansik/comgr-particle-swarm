@@ -1,6 +1,14 @@
 package ch.comgr.particleswarm.util;
 
+import ch.fhnw.ether.scene.mesh.DefaultMesh;
+import ch.fhnw.ether.scene.mesh.IMesh;
+import ch.fhnw.ether.scene.mesh.geometry.DefaultGeometry;
+import ch.fhnw.ether.scene.mesh.geometry.IGeometry;
+import ch.fhnw.ether.scene.mesh.material.ColorMaterial;
+import ch.fhnw.util.color.RGBA;
+import ch.fhnw.util.math.Mat4;
 import ch.fhnw.util.math.Vec3;
+import ch.fhnw.util.math.geometry.GeodesicSphere;
 
 import java.util.Random;
 
@@ -12,14 +20,13 @@ public class EtherGLUtil {
 
     /**
      * Limits the maximal value of a vector. Rescales the vector if one of the elements are over the limit.
-     * @param v Vector to limit
+     *
+     * @param v   Vector to limit
      * @param max Max value of the elements
      * @return Limited vector
      */
-    public static Vec3 limit(Vec3 v, float max)
-    {
-        if(v.length() > max*max)
-        {
+    public static Vec3 limit(Vec3 v, float max) {
+        if (v.length() > max * max) {
             v = v.normalize();
             v = v.scale(max);
         }
@@ -29,12 +36,12 @@ public class EtherGLUtil {
 
     /**
      * Checks if two vec3 are equals with real floating-point checks.
+     *
      * @param a First vector
      * @param b Second vector
      * @return True if vector a is equals vector b
      */
-    public static boolean equalVec3(Vec3 a, Vec3 b)
-    {
+    public static boolean equalVec3(Vec3 a, Vec3 b) {
         return (isFloatingEqual(a.x, b.x)
                 && isFloatingEqual(a.y, b.y)
                 && isFloatingEqual(a.z, b.z));
@@ -44,6 +51,7 @@ public class EtherGLUtil {
     /**
      * Compare to floats for (almost) equality. Will check whether they are
      * at most 5 ULP apart.
+     *
      * @param v1
      * @param v2
      * @return
@@ -58,10 +66,10 @@ public class EtherGLUtil {
 
     /**
      * Generates a random vec3 with a uniform spherical distribution.
+     *
      * @return Spherical distributed vec3
      */
-    public static Vec3 randomVec3()
-    {
+    public static Vec3 randomVec3() {
         double phi = Math.random() * TWO_PI;
         double costheta = GetRandomFloat(-1, 1);
         double theta = Math.acos(costheta);
@@ -70,16 +78,61 @@ public class EtherGLUtil {
         double y = Math.sin(theta) * Math.sin(phi);
         double z = Math.cos(theta);
 
-        return new Vec3((float)x, (float)y, (float)z);
+        return new Vec3((float) x, (float) y, (float) z);
     }
 
     /**
      * Generates a random float in a specific range.
+     *
      * @param lower Lower bound of the range
      * @param upper Upper bound of the range
      * @return Random floating point number
      */
     public static float GetRandomFloat(float lower, float upper) {
         return lower + new Random().nextFloat() * (upper - lower);
+    }
+
+    /**
+     * Creates a new sphere mash.
+     *
+     * @param size Size of the sphere
+     * @return Sphere mash
+     */
+    public static IMesh createSphere(float size) {
+        GeodesicSphere sphere = new GeodesicSphere(1);
+        IMesh s = new DefaultMesh(new ColorMaterial(new RGBA(0, 1, 1, 0.5f)),
+                DefaultGeometry.createV(IGeometry.Primitive.TRIANGLES,
+                        sphere.getTriangles()),
+                IMesh.Queue.TRANSPARENCY);
+        s.setTransform(Mat4.scale(size));
+        s.requestUpdate(Mat4.scale(size));
+        return s;
+    }
+
+    /**
+     * Creates 3d grid box.
+     *
+     * @param size Size of the box
+     * @return Box mesh
+     */
+    public static IMesh createBox(Vec3 size) {
+        float[] vertices = {0, 0, 0, size.x, 0, 0,
+                0, 0, 0, 0, size.y, 0,
+                0, 0, 0, 0, 0, size.z,
+                size.x, 0, 0, size.x, size.y, 0,
+                size.x, 0, 0, size.x, 0, size.z,
+                0, size.y, 0, size.x, size.y, 0,
+                0, size.y, 0, 0, size.y, size.z,
+                0, 0, size.z, size.x, 0, size.z,
+                0, 0, size.z, 0, size.y, size.z,
+                size.x, 0, size.z, size.x, size.y, size.z,
+                0, size.y, size.z, size.x, size.y, size.z,
+                size.x, size.y, 0, size.x, size.y, size.z
+        };
+        IMesh box = new DefaultMesh(new ColorMaterial(new RGBA(1f, 1f, 0.5f, 1)),
+                DefaultGeometry.createV(IGeometry.Primitive.LINES,
+                        vertices),
+                IMesh.Queue.DEPTH);
+        return box;
     }
 }

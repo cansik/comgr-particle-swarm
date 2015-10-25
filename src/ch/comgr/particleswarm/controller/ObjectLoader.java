@@ -13,6 +13,7 @@ import java.util.List;
 public class ObjectLoader {
     /**
      * Loads all meshes from an object file.
+     *
      * @param path Path to the object file
      * @return List of meshes of the object file
      */

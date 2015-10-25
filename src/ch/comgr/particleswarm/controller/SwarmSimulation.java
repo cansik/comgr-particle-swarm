@@ -9,10 +9,18 @@ import ch.fhnw.ether.controller.event.IKeyEvent;
 import ch.fhnw.ether.scene.DefaultScene;
 import ch.fhnw.ether.scene.IScene;
 import ch.fhnw.ether.scene.camera.Camera;
+import ch.fhnw.ether.scene.mesh.DefaultMesh;
+import ch.fhnw.ether.scene.mesh.IMesh;
+import ch.fhnw.ether.scene.mesh.geometry.DefaultGeometry;
+import ch.fhnw.ether.scene.mesh.geometry.IGeometry;
+import ch.fhnw.ether.scene.mesh.material.ColorMaterial;
 import ch.fhnw.ether.ui.Button;
 import ch.fhnw.ether.view.IView;
 import ch.fhnw.ether.view.gl.DefaultView;
+import ch.fhnw.util.color.RGBA;
+import ch.fhnw.util.math.Mat4;
 import ch.fhnw.util.math.Vec3;
+import ch.fhnw.util.math.geometry.GeodesicSphere;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -22,10 +30,12 @@ import java.util.Collections;
  * Created by cansik on 20/10/15.
  */
 public class SwarmSimulation {
-    /************** Config-Variables ***************/
+    /**************
+     * Config-Variables
+     ***************/
 
     // simulation loop interval
-    private static final double LOOP_INTERVAL = 1.0/60.0;
+    private static final double LOOP_INTERVAL = 1.0 / 60.0;
     // camera location increments
     private static final float INC_XY = 0.25f;
     private static final float INC_Z = 0.25f;
@@ -43,7 +53,9 @@ public class SwarmSimulation {
             //@formatter:on
     };
 
-    /************** Local Variables ***************/
+    /**************
+     * Local Variables
+     ***************/
 
     private IController controller;
     private Camera camera;
@@ -54,8 +66,7 @@ public class SwarmSimulation {
 
     /*****************************/
 
-    public SwarmSimulation()
-    {
+    public SwarmSimulation() {
         // Create controller
         controller = new DefaultController() {
             @Override
@@ -90,7 +101,9 @@ public class SwarmSimulation {
                 }
                 // update the camera system
                 repaintViews();
-            };
+            }
+
+            ;
         };
 
         // Create view
@@ -115,9 +128,10 @@ public class SwarmSimulation {
      */
     public void run() {
 
+        scene.add3DObject(EtherGLUtil.createBox(new Vec3(100, 100, 100)));
+
         //create initial scene
-        for(int i = 0; i < 25; i++)
-        {
+        for (int i = 0; i < 100; i++) {
             //start at 50, 50, 50
             Vec3 distr = EtherGLUtil.randomVec3().scale(5f);
             addSimulationObject(new Particle(distr.add(new Vec3(50, 50, 50)), "Gen (" + i + ")"));
@@ -145,10 +159,10 @@ public class SwarmSimulation {
 
     /**
      * Adds a new simulation object to the simulation.
+     *
      * @param obj Object to add
      */
-    private void addSimulationObject(ISimulationObject obj)
-    {
+    private void addSimulationObject(ISimulationObject obj) {
         simulationObjects.add(obj);
 
         obj.getMeshes().forEach((iMesh ->

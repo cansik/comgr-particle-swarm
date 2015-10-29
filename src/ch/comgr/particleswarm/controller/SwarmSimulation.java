@@ -68,6 +68,8 @@ public class SwarmSimulation {
     /*****************************/
 
     public SwarmSimulation() {
+        simulationObjects = new ArrayList<>();
+
         // Create controller
         controller = new DefaultController() {
             @Override
@@ -100,37 +102,37 @@ public class SwarmSimulation {
                     default:
                         super.keyPressed(e);
                 }
-                // update the camera system
-                repaint();
             }
         };
 
-        // Create view
-        camera = new Camera();
-        camera.setPosition(default_camera_location);
-        camera.setUp(new Vec3(0, 0, 1));
+        controller.run((time) -> {
+            // Create view
+            camera = new Camera();
+            camera.setPosition(default_camera_location);
+            camera.setUp(new Vec3(0, 0, 1));
 
-        view = new DefaultView(controller, 100, 100, 500, 500, IView.INTERACTIVE_VIEW, "Swarm Simulation");
+            view = new DefaultView(controller, 100, 100, 500, 500, IView.INTERACTIVE_VIEW, "Swarm Simulation");
 
-        // Create scene
-        scene = new DefaultScene(controller);
-        controller.setScene(scene);
+            // Create scene
+            scene = new DefaultScene(controller);
+            controller.setScene(scene);
 
-        //add camera
-        scene.add3DObject(camera);
-        controller.setCamera(view, camera);
+            //add camera
+            scene.add3DObject(camera);
+            controller.setCamera(view, camera);
 
-        // Add an exit button
-        controller.getUI().addWidget(new Button(0, 0, "Quit", "Quit", KeyEvent.VK_ESCAPE, (button, v) -> System.exit(0)));
+            // Add an exit button
+            controller.getUI().addWidget(new Button(0, 0, "Quit", "Quit", KeyEvent.VK_ESCAPE, (button, v) -> System.exit(0)));
 
-        simulationObjects = new ArrayList<>();
+            // update the camera system
+            controller.repaint();
+
+            //initialseGameObjects
+            initialiseScene();
+        });
     }
 
-    /**
-     * Initialises the simulation and starts the simulation loop.
-     */
-    public void run() {
-
+    public void initialiseScene() {
         scene.add3DObject(EtherGLUtil.createBox(new Vec3(100, 100, 100)));
 
         //create initial scene
@@ -139,14 +141,16 @@ public class SwarmSimulation {
             Vec3 distr = EtherGLUtil.randomVec3().scale(5f);
             addSimulationObject(new Particle(distr.add(new Vec3(50, 50, 50)), "Gen (" + i + ")"));
         }
+    }
 
+    /**
+     * Initialises the simulation and starts the simulation loop.
+     */
+    public void run() {
         //main simulation loop
         controller.animate((time, interval) -> {
             //update simulation logic for each element
             update();
-
-            //repaint view
-            controller.repaint();
             return true;
         });
     }
@@ -155,7 +159,9 @@ public class SwarmSimulation {
      * Updates all simulation objects.
      */
     private void update() {
-        simulationObjects.stream().forEach(o -> o.update(Collections.unmodifiableList(simulationObjects)));
+        for (ISimulationObject o : simulationObjects) {
+            o.update(Collections.unmodifiableList(simulationObjects));
+        }
     }
 
     /**
@@ -166,8 +172,7 @@ public class SwarmSimulation {
     private void addSimulationObject(ISimulationObject obj) {
         simulationObjects.add(obj);
 
-        obj.getMeshes().forEach((iMesh ->
-                scene.add3DObject(iMesh)
-        ));
+        for (IMesh m : obj.getMeshes())
+            scene.add3DObject(m);
     }
 }

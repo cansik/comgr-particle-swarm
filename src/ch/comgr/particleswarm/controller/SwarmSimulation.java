@@ -22,10 +22,12 @@ import ch.fhnw.util.color.RGBA;
 import ch.fhnw.util.math.Mat4;
 import ch.fhnw.util.math.Vec3;
 import ch.fhnw.util.math.geometry.GeodesicSphere;
+import com.jogamp.common.util.ArrayHashSet;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by cansik on 20/10/15.
@@ -63,12 +65,12 @@ public class SwarmSimulation {
     private DefaultView view;
     private IScene scene;
 
-    private ArrayList<ISimulationObject> simulationObjects;
+    private CopyOnWriteArrayList<ISimulationObject> simulationObjects;
 
     /*****************************/
 
     public SwarmSimulation() {
-        simulationObjects = new ArrayList<>();
+        simulationObjects = new CopyOnWriteArrayList<>();
 
         // Create controller
         controller = new DefaultController() {
@@ -160,7 +162,7 @@ public class SwarmSimulation {
      */
     private void update() {
         for (ISimulationObject o : simulationObjects) {
-            o.update(Collections.unmodifiableList(simulationObjects));
+            o.update(new ArrayList<>(simulationObjects));
         }
     }
 

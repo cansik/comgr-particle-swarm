@@ -3,3 +3,4 @@
 out
 build
 ~$WeeklyHighlight.pptx
+hs_err_pid*.log

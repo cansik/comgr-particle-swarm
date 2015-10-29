@@ -74,6 +74,15 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
     public void update(List<ISimulationObject> simulationObjects) {
         super.nextStep(simulationObjects);
 
+        /*
+        // crashes visualVM
+        ArrayList<BaseSwarmObject> swarm = new ArrayList<>();
+
+        for (ISimulationObject sim : simulationObjects)
+            if (sim instanceof BaseSwarmObject)
+                swarm.add((BaseSwarmObject) sim);
+        */
+
         //update meshes
         setPosition(position);
     }

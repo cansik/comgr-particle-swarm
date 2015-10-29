@@ -60,6 +60,7 @@ public abstract class BaseSwarmObject {
         //todo: check if lambda is fast enough!
         //get swarm
         swarm = new ArrayList<>();
+
         for (ISimulationObject sim : simulationObjects)
             if (sim instanceof BaseSwarmObject)
                 swarm.add((BaseSwarmObject) sim);
@@ -270,7 +271,7 @@ public abstract class BaseSwarmObject {
      * @return List of tupel with BaseSwarmObject and distance
      */
     public List<Tuple<BaseSwarmObject, Float>> getNeighbours(float maximalDistance) {
-        List<Tuple<BaseSwarmObject, Float>> neighbours = new ArrayList<>();
+        List<Tuple<BaseSwarmObject, Float>> n = new ArrayList<>();
 
         for (BaseSwarmObject b : swarm) {
             if (b.equals(this))
@@ -279,10 +280,10 @@ public abstract class BaseSwarmObject {
             float distance = b.getDistanceTo(this);
 
             if (distance <= maximalDistance)
-                neighbours.add(new Tuple<>(b, distance));
+                n.add(new Tuple<>(b, distance));
         }
 
-        return neighbours;
+        return n;
     }
 
     /**

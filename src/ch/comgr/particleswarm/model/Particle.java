@@ -61,7 +61,7 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
 
         meshes.forEach((mesh) -> {
             mesh.setTransform(transform);
-            mesh.requestUpdate(transform);
+            mesh.updateRequest();
         });
     }
 

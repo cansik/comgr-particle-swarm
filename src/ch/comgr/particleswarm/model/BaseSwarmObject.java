@@ -101,10 +101,35 @@ public abstract class BaseSwarmObject {
         return acceleration;
     }
 
+
+    void checkBorders() {
+        //rand_abstand
+        float r = 2f;
+
+        float x = position.x;
+        float y = position.y;
+        float z = position.z;
+
+        float v1 = velocity.x;
+        float v2 = velocity.y;
+        float v3 = velocity.z;
+
+        //lower
+        if (x < -r) v1 *= -1;
+        if (y < -r) v2 *= -1;
+        if (z < -r) v3 *= -1;
+
+        if (x > BOX_WIDTH + r) v1 *= -1;
+        if (y > BOX_HEIGHT + r) v2 *= -1;
+        if (z > BOX_DEPTH + r) v3 *= -1;
+
+        velocity = new Vec3(v1, v2, v3);
+    }
+
     /**
      * Checks if object is out of bounds and puts in on the other side of the box.
      */
-    void checkBorders() {
+    void checkBordersPutOtherSide() {
         //rand_abstand
         float r = 0f;
 

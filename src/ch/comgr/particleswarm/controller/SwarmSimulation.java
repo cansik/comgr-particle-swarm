@@ -6,6 +6,7 @@ import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.fhnw.ether.controller.DefaultController;
 import ch.fhnw.ether.controller.IController;
 import ch.fhnw.ether.controller.event.IKeyEvent;
+import ch.fhnw.ether.controller.event.IScheduler;
 import ch.fhnw.ether.scene.DefaultScene;
 import ch.fhnw.ether.scene.IScene;
 import ch.fhnw.ether.scene.camera.Camera;
@@ -40,7 +41,7 @@ public class SwarmSimulation {
     private static final float INC_XY = 0.25f;
     private static final float INC_Z = 0.25f;
     // default camera location Vec3
-    private static final Vec3 default_camera_location = new Vec3(5, 5, 3);
+    private static final Vec3 default_camera_location = new Vec3(200, 200, 100);
     // printable Help information
     private static final String[] HELP = {
             //@formatter:off
@@ -71,7 +72,7 @@ public class SwarmSimulation {
         controller = new DefaultController() {
             @Override
             public void keyPressed(IKeyEvent e) {
-                switch (e.getKey()) {
+                switch (e.getKeyCode()) {
                     case IKeyEvent.VK_UP:
                         camera.setPosition(camera.getPosition().add(Vec3.Y.scale(INC_XY)));
                         break;
@@ -100,10 +101,8 @@ public class SwarmSimulation {
                         super.keyPressed(e);
                 }
                 // update the camera system
-                repaintViews();
+                repaint();
             }
-
-            ;
         };
 
         // Create view
@@ -111,11 +110,15 @@ public class SwarmSimulation {
         camera.setPosition(default_camera_location);
         camera.setUp(new Vec3(0, 0, 1));
 
-        view = new DefaultView(controller, 100, 100, 500, 500, IView.INTERACTIVE_VIEW, "Swarm Simulation", camera);
+        view = new DefaultView(controller, 100, 100, 500, 500, IView.INTERACTIVE_VIEW, "Swarm Simulation");
 
         // Create scene
         scene = new DefaultScene(controller);
         controller.setScene(scene);
+
+        //add camera
+        scene.add3DObject(camera);
+        controller.setCamera(view, camera);
 
         // Add an exit button
         controller.getUI().addWidget(new Button(0, 0, "Quit", "Quit", KeyEvent.VK_ESCAPE, (button, v) -> System.exit(0)));
@@ -131,21 +134,19 @@ public class SwarmSimulation {
         scene.add3DObject(EtherGLUtil.createBox(new Vec3(100, 100, 100)));
 
         //create initial scene
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 200; i++) {
             //start at 50, 50, 50
             Vec3 distr = EtherGLUtil.randomVec3().scale(5f);
             addSimulationObject(new Particle(distr.add(new Vec3(50, 50, 50)), "Gen (" + i + ")"));
         }
 
         //main simulation loop
-        controller.getScheduler().repeat(0, LOOP_INTERVAL, (time, interval) -> {
-
+        controller.animate((time, interval) -> {
             //update simulation logic for each element
             update();
 
             //repaint view
-            controller.repaintViews();
-
+            controller.repaint();
             return true;
         });
     }

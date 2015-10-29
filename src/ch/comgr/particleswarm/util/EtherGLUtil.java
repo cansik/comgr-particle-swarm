@@ -105,7 +105,7 @@ public class EtherGLUtil {
                         sphere.getTriangles()),
                 IMesh.Queue.TRANSPARENCY);
         s.setTransform(Mat4.scale(size));
-        s.requestUpdate(Mat4.scale(size));
+        s.updateRequest();
         return s;
     }
 

@@ -4,6 +4,7 @@ import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.comgr.particleswarm.util.Tuple;
 import ch.fhnw.util.math.Vec3;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,9 +59,10 @@ public abstract class BaseSwarmObject {
     public void nextStep(List<ISimulationObject> simulationObjects) {
         //todo: check if lambda is fast enough!
         //get swarm
-        swarm = simulationObjects.stream()
-                .map(so -> (so instanceof BaseSwarmObject) ? (BaseSwarmObject) so : null).filter(bso -> bso != null)
-                .collect(Collectors.toList());
+        swarm = new ArrayList<>();
+        for (ISimulationObject sim : simulationObjects)
+            if (sim instanceof BaseSwarmObject)
+                swarm.add((BaseSwarmObject) sim);
 
         //get neighbours
         neighbours = getNeighbours(NEIGHBOUR_RADIUS);
@@ -268,11 +270,19 @@ public abstract class BaseSwarmObject {
      * @return List of tupel with BaseSwarmObject and distance
      */
     public List<Tuple<BaseSwarmObject, Float>> getNeighbours(float maximalDistance) {
-        return swarm.stream()
-                .filter(b -> !b.equals(this))
-                .map(b -> new Tuple<>(b, b.getDistanceTo(this)))
-                .filter(t -> t.getSecond() <= maximalDistance)
-                .collect(Collectors.toList());
+        List<Tuple<BaseSwarmObject, Float>> neighbours = new ArrayList<>();
+
+        for (BaseSwarmObject b : swarm) {
+            if (b.equals(this))
+                continue;
+
+            float distance = b.getDistanceTo(this);
+
+            if (distance <= maximalDistance)
+                neighbours.add(new Tuple<>(b, distance));
+        }
+
+        return neighbours;
     }
 
     /**

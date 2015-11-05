@@ -61,7 +61,7 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
 
         meshes.forEach((mesh) -> {
             mesh.setTransform(transform);
-            mesh.updateRequest();
+            //mesh.updateRequest();
         });
     }
 
@@ -83,7 +83,6 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
                 swarm.add((BaseSwarmObject) sim);
         */
 
-        //update meshes
         setPosition(position);
     }
 }

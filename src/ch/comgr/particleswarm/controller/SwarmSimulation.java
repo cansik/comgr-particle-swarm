@@ -2,31 +2,23 @@ package ch.comgr.particleswarm.controller;
 
 import ch.comgr.particleswarm.model.ISimulationObject;
 import ch.comgr.particleswarm.model.Particle;
+import ch.comgr.particleswarm.ui.Label;
 import ch.comgr.particleswarm.util.EtherGLUtil;
+import ch.comgr.particleswarm.util.FPSCounter;
 import ch.fhnw.ether.controller.DefaultController;
 import ch.fhnw.ether.controller.IController;
 import ch.fhnw.ether.controller.event.IKeyEvent;
-import ch.fhnw.ether.controller.event.IScheduler;
 import ch.fhnw.ether.scene.DefaultScene;
 import ch.fhnw.ether.scene.IScene;
 import ch.fhnw.ether.scene.camera.Camera;
-import ch.fhnw.ether.scene.mesh.DefaultMesh;
 import ch.fhnw.ether.scene.mesh.IMesh;
-import ch.fhnw.ether.scene.mesh.geometry.DefaultGeometry;
-import ch.fhnw.ether.scene.mesh.geometry.IGeometry;
-import ch.fhnw.ether.scene.mesh.material.ColorMaterial;
 import ch.fhnw.ether.ui.Button;
 import ch.fhnw.ether.view.IView;
 import ch.fhnw.ether.view.gl.DefaultView;
-import ch.fhnw.util.color.RGBA;
-import ch.fhnw.util.math.Mat4;
 import ch.fhnw.util.math.Vec3;
-import ch.fhnw.util.math.geometry.GeodesicSphere;
-import com.jogamp.common.util.ArrayHashSet;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -66,6 +58,9 @@ public class SwarmSimulation {
     private IScene scene;
 
     private CopyOnWriteArrayList<ISimulationObject> simulationObjects;
+
+    private FPSCounter fpsCounter = new FPSCounter();
+    private Label fpsLabel;
 
     /*****************************/
 
@@ -126,7 +121,11 @@ public class SwarmSimulation {
             // Add an exit button
             controller.getUI().addWidget(new Button(0, 0, "Quit", "Quit", KeyEvent.VK_ESCAPE, (button, v) -> System.exit(0)));
 
-            // update the camera system
+            //Add fps
+            fpsLabel = new Label(5, controller.getUI().getHeight() - 60, "FPS", "FPS Counter");
+            controller.getUI().addWidget(fpsLabel);
+
+            // count the camera system
             controller.repaint();
 
             //initialseGameObjects
@@ -151,9 +150,10 @@ public class SwarmSimulation {
     public void run() {
         //main simulation loop
         controller.animate((time, interval) -> {
-            //update simulation logic for each element
+            updateFPS();
+
+            //count simulation logic for each element
             update();
-            return true;
         });
     }
 
@@ -164,6 +164,13 @@ public class SwarmSimulation {
         for (ISimulationObject o : simulationObjects) {
             o.update(new ArrayList<>(simulationObjects));
         }
+    }
+
+    private void updateFPS()
+    {
+        fpsCounter.count();
+        fpsLabel.setText("FPS: " + fpsCounter.getFps());
+        controller.getUI().updateRequest();
     }
 
     /**

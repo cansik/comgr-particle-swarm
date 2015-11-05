@@ -71,7 +71,7 @@ public abstract class BaseSwarmObject {
         //calculate new acceleration
         Vec3 acceleration = calculateAcceleration();
 
-        //apply acceleration to velocity and update position
+        //apply acceleration to velocity and count position
         velocity = velocity.add(acceleration);
         velocity = EtherGLUtil.limit(velocity, MAX_SPEED);
 
@@ -132,7 +132,7 @@ public abstract class BaseSwarmObject {
     /**
      * Checks if object is out of bounds and puts in on the other side of the box.
      */
-    void checkBordersPutOtherSide() {
+    void checkBordersAndGoThrough() {
         //rand_abstand
         float r = 0f;
 

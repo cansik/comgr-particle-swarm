@@ -5,6 +5,7 @@ import ch.fhnw.ether.scene.mesh.IMesh;
 import ch.fhnw.ether.scene.mesh.geometry.DefaultGeometry;
 import ch.fhnw.ether.scene.mesh.geometry.IGeometry;
 import ch.fhnw.ether.scene.mesh.material.ColorMaterial;
+import ch.fhnw.ether.scene.mesh.material.LineMaterial;
 import ch.fhnw.util.color.RGBA;
 import ch.fhnw.util.math.Mat4;
 import ch.fhnw.util.math.Vec3;
@@ -105,7 +106,7 @@ public class EtherGLUtil {
                         sphere.getTriangles()),
                 IMesh.Queue.TRANSPARENCY);
         s.setTransform(Mat4.scale(size));
-        s.updateRequest();
+        //s.updateRequest();
         return s;
     }
 
@@ -129,7 +130,7 @@ public class EtherGLUtil {
                 0, size.y, size.z, size.x, size.y, size.z,
                 size.x, size.y, 0, size.x, size.y, size.z
         };
-        IMesh box = new DefaultMesh(new ColorMaterial(new RGBA(1f, 1f, 0.5f, 1)),
+        IMesh box = new DefaultMesh(new LineMaterial(new RGBA(1f, 1f, 0.5f, 1)),
                 DefaultGeometry.createV(IGeometry.Primitive.LINES,
                         vertices),
                 IMesh.Queue.DEPTH);

@@ -19,7 +19,7 @@ public interface ISimulationObject {
     //todo: pass a wrapper object to store more information (parameter..)
 
     /**
-     * Method to update a simulation object.
+     * Method to count a simulation object.
      *
      * @param simulationObjects A list of all simulations object to interact with
      */

@@ -2,16 +2,9 @@ package ch.comgr.particleswarm.model;
 
 import ch.comgr.particleswarm.controller.ObjectLoader;
 import ch.comgr.particleswarm.util.EtherGLUtil;
-import ch.fhnw.ether.scene.mesh.DefaultMesh;
 import ch.fhnw.ether.scene.mesh.IMesh;
-import ch.fhnw.ether.scene.mesh.MeshLibrary;
-import ch.fhnw.ether.scene.mesh.geometry.DefaultGeometry;
-import ch.fhnw.ether.scene.mesh.geometry.IGeometry;
-import ch.fhnw.ether.scene.mesh.material.ColorMaterial;
 import ch.fhnw.util.math.Mat4;
 import ch.fhnw.util.math.Vec3;
-import ch.fhnw.util.color.RGBA;
-import ch.fhnw.util.math.geometry.GeodesicSphere;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,21 +16,28 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
 
     private List<IMesh> meshes = new ArrayList<>();
 
+    float a = 0f;
+
     public Particle(Vec3 startPos, String name) {
         super(startPos);
 
         //cube mash
         //meshes.add(MeshLibrary.createCube());
 
+        meshes.add(EtherGLUtil.createSquarePyramid(5));
+        meshes.add(EtherGLUtil.createLine(velocity, 20));
+
+        //meshes.add(EtherGLUtil.createSphere(1));
+
         //add sphere mash instead of cube
-        meshes.add(EtherGLUtil.createSphere(1));
+        //meshes.add(EtherGLUtil.createSphere(1));
 
         //set name
         meshes.get(0).setName(name);
 
         //getAndAddMeshesFromObj();
 
-        setPosition(startPos);
+        setPosition(startPos, velocity);
     }
 
     /**
@@ -55,13 +55,26 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
      *
      * @param pos Target position
      */
-    private void setPosition(Vec3 pos) {
-        //todo: add object rotation
-        Mat4 transform = Mat4.translate(pos);
+    private void setPosition(Vec3 pos, Vec3 velocity) {
+
+        float angleY = (float) Math.atan2(velocity.z, velocity.x);
+        float angleX = (float) Math.atan2(velocity.y, Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.z, 2)));
+
+        float angleYinGrad = (float)Math.toDegrees(angleY);
+        float angleXinGrad = (float)Math.toDegrees(angleX);
+
+        Mat4 transform = Mat4.multiply(Mat4.translate(pos),
+                Mat4.rotate(angleXinGrad, Vec3.X),
+                Mat4.rotate(angleYinGrad, Vec3.Y));
+
+
+        /*
+        Mat4 transform = Mat4.multiply(Mat4.translate(pos),
+                Mat4.lookAt(position, position.add(velocity), new Vec3(0, 0, 1)));
+        */
 
         meshes.forEach((mesh) -> {
             mesh.setTransform(transform);
-            //mesh.updateRequest();
         });
     }
 
@@ -83,6 +96,6 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
                 swarm.add((BaseSwarmObject) sim);
         */
 
-        setPosition(position);
+        setPosition(position, velocity);
     }
 }

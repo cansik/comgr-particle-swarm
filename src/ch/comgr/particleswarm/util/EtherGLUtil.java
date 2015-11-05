@@ -136,4 +136,49 @@ public class EtherGLUtil {
                 IMesh.Queue.DEPTH);
         return box;
     }
+
+    public static IMesh createLine(Vec3 position, float length) {
+        length = length / 2;
+        Vec3 l = new Vec3(length, length, length);
+        position = position.add(l);
+        Vec3 minusPos = position.scale(-1);
+        float[] vertices = {
+                //Right Side
+                position.x, position.y, position.z,
+                minusPos.x, minusPos.y, minusPos.z
+
+        };
+        IMesh line = new DefaultMesh(new LineMaterial(new RGBA(0f, 0.5f, 1.0f, 1)),
+                DefaultGeometry.createV(IGeometry.Primitive.LINES,
+                        vertices),
+                IMesh.Queue.DEPTH);
+        return line;
+    }
+
+    public static IMesh createSquarePyramid(float depth) {
+        float d = depth * -1;
+        float[] vertices = {
+                //Right Side
+                0, 0, 0,
+                0.5f, -0.5f, d,
+                0.5f, 0.5f, d,
+                //Left Side
+                0, 0, 0,
+                -0.5f, 0.5f, d,
+                -0.5f, -0.5f, d,
+                //Top
+                0, 0, 0,
+                -0.5f, 0.5f, d,
+                0.5f, 0.5f, d,
+                //Bottom
+                0, 0, 0,
+                -0.5f, -0.5f, d,
+                0.5f, -0.5f, d,
+        };
+        IMesh squarePyramid = new DefaultMesh(new ColorMaterial(new RGBA(0f, 0.5f, 1.0f, 1)),
+                DefaultGeometry.createV(IGeometry.Primitive.TRIANGLES,
+                        vertices),
+                IMesh.Queue.DEPTH);
+        return squarePyramid;
+    }
 }

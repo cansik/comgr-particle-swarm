@@ -31,7 +31,7 @@ public class SwarmSimulation {
      ***************/
 
     // simulation loop interval
-    private static final double LOOP_INTERVAL = 1.0 / 60.0;
+    private static final double LOOP_INTERVAL = 0.5; //1.0 / 60.0;
     // camera location increments
     private static final float INC_XY = 0.25f;
     private static final float INC_Z = 0.25f;

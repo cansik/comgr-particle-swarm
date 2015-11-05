@@ -3,6 +3,7 @@ package ch.comgr.particleswarm.controller;
 import ch.comgr.particleswarm.model.ISimulationObject;
 import ch.comgr.particleswarm.model.Particle;
 import ch.comgr.particleswarm.ui.Label;
+import ch.comgr.particleswarm.ui.PushButton;
 import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.comgr.particleswarm.util.FPSCounter;
 import ch.fhnw.ether.controller.DefaultController;
@@ -119,7 +120,7 @@ public class SwarmSimulation {
             controller.setCamera(view, camera);
 
             // Add an exit button
-            controller.getUI().addWidget(new Button(0, 0, "Quit", "Quit", KeyEvent.VK_ESCAPE, (button, v) -> System.exit(0)));
+            controller.getUI().addWidget(new PushButton(0, 0, "Quit", "Quit", KeyEvent.VK_ESCAPE, (button, v) -> System.exit(0)));
 
             //Add fps
             fpsLabel = new Label(5, controller.getUI().getHeight() - 60, "FPS", "FPS Counter");

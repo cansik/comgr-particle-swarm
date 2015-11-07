@@ -1,4 +1,4 @@
-package ch.comgr.particleswarm.controller;
+package ch.comgr.particleswarm.util;
 
 import ch.fhnw.ether.formats.obj.OBJReader;
 import ch.fhnw.ether.scene.mesh.IMesh;

@@ -1,7 +1,7 @@
 package ch.comgr.particleswarm.model;
 
-import ch.comgr.particleswarm.controller.ObjectLoader;
 import ch.comgr.particleswarm.util.EtherGLUtil;
+import ch.comgr.particleswarm.util.ObjectLoader;
 import ch.fhnw.ether.scene.mesh.IMesh;
 import ch.fhnw.util.math.Mat4;
 import ch.fhnw.util.math.Vec3;
@@ -32,10 +32,11 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
         //add sphere mash instead of cube
         //meshes.add(EtherGLUtil.createSphere(1));
 
+        // ad meshed from obj
+        //getAndAddMeshesFromObj("bunny.obj");
+
         //set name
         meshes.get(0).setName(name);
-
-        //getAndAddMeshesFromObj();
 
         setPosition(startPos, velocity);
     }
@@ -43,8 +44,8 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
     /**
      * Loads mesh from obj file.
      */
-    private void getAndAddMeshesFromObj() {
-        meshes.addAll(new ObjectLoader().getMeshesFromObject("../assets/bunny.obj"));
+    private void getAndAddMeshesFromObj(String name) {
+        meshes.addAll(new ObjectLoader().getMeshesFromObject("../assets/" + name));
 
         // check if meshes were correct initialised
         assert meshes != null;
@@ -66,7 +67,6 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
         Mat4 transform = Mat4.multiply(Mat4.translate(pos),
                 Mat4.rotate(angleXinGrad, Vec3.X),
                 Mat4.rotate(angleYinGrad, Vec3.Y));
-
 
         /*
         Mat4 transform = Mat4.multiply(Mat4.translate(pos),

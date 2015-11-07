@@ -7,27 +7,27 @@ import ch.fhnw.ether.ui.GraphicsPlane;
 /**
  * Created by cansik on 05/11/15.
  */
-public class PushButton extends Button {
+public class SwarmButton extends Button {
 
     private static final int BUTTON_WIDTH = 48;
     private static final int BUTTON_HEIGHT = 48;
 
     private static final int BUTTON_GAP = 8;
 
-    public PushButton(int x, int y, String label, String help, int key) {
+    public SwarmButton(int x, int y, String label, String help, int key) {
         super(x, y, label, help, key, null);
     }
 
-    public PushButton(int x, int y, String label, String help, int key, IButtonAction action) {
+    public SwarmButton(int x, int y, String label, String help, int key, IButtonAction action) {
         super(x, y, label, help, key, action);
     }
 
-    public PushButton(int x, int y, String label, String help, int key, State state, IButtonAction action) {
+    public SwarmButton(int x, int y, String label, String help, int key, State state, IButtonAction action) {
         super(x, y, label, help, key, action);
         setState(state);
     }
 
-    public PushButton(int x, int y, String label, String help, int key, boolean pressed, IButtonAction action) {
+    public SwarmButton(int x, int y, String label, String help, int key, boolean pressed, IButtonAction action) {
         super(x, y, label, help, key, action);
         setState(pressed);
     }
@@ -53,9 +53,9 @@ public class PushButton extends Button {
 
     @Override
     public void draw(GraphicsPlane surface) {
-        int bw = PushButton.BUTTON_WIDTH;
-        int bh = PushButton.BUTTON_HEIGHT;
-        int bg = PushButton.BUTTON_GAP;
+        int bw = SwarmButton.BUTTON_WIDTH;
+        int bh = SwarmButton.BUTTON_HEIGHT;
+        int bg = SwarmButton.BUTTON_GAP;
         int bx = getX() * (bg + bw);
         int by = getY() * (bg + bh);
         surface.fillRect(getState().getColor(), bx + 4, surface.getHeight() - by - bh - 4, bw, bh);

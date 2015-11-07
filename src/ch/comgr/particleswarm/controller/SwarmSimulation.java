@@ -2,8 +2,8 @@ package ch.comgr.particleswarm.controller;
 
 import ch.comgr.particleswarm.model.ISimulationObject;
 import ch.comgr.particleswarm.model.Particle;
-import ch.comgr.particleswarm.ui.Label;
-import ch.comgr.particleswarm.ui.PushButton;
+import ch.comgr.particleswarm.ui.InformationCollectorWidget;
+import ch.comgr.particleswarm.ui.SwarmButton;
 import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.comgr.particleswarm.util.FPSCounter;
 import ch.fhnw.ether.controller.DefaultController;
@@ -13,19 +13,24 @@ import ch.fhnw.ether.scene.DefaultScene;
 import ch.fhnw.ether.scene.IScene;
 import ch.fhnw.ether.scene.camera.Camera;
 import ch.fhnw.ether.scene.mesh.IMesh;
-import ch.fhnw.ether.ui.Button;
+import ch.fhnw.ether.ui.GraphicsPlane;
+import ch.fhnw.ether.ui.ParameterWindow;
+import ch.fhnw.ether.ui.Slider;
 import ch.fhnw.ether.view.IView;
 import ch.fhnw.ether.view.gl.DefaultView;
 import ch.fhnw.util.math.Vec3;
 
+import javax.swing.*;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by cansik on 20/10/15.
  */
-public class SwarmSimulation {
+public class SwarmSimulation extends JFrame {
     /**************
      * Config-Variables
      ***************/
@@ -35,19 +40,15 @@ public class SwarmSimulation {
     // camera location increments
     private static final float INC_XY = 0.25f;
     private static final float INC_Z = 0.25f;
+    // screen properties
+    private static final int screenPositionX = 10;
+    private static final int screenPositionY = 40;
+    private static final int screenWidth = 800;
+    private static final int screenHeight = 800;
+    private static final int maxNumberOfObjects = 1000;
+    private static final float initialNumberOfObjects = 200;
     // default camera location Vec3
     private static final Vec3 default_camera_location = new Vec3(200, 200, 100);
-    // printable Help information
-    private static final String[] HELP = {
-            //@formatter:off
-            "Swarm Simulator",
-            "",
-            "[up/down/left/right] to change camera location with axis-focus",
-            "[A/Q] to change camera location up and down without rotation",
-            "[R] reset camera location",
-            "[H] print help",
-            //@formatter:on
-    };
 
     /**************
      * Local Variables
@@ -55,13 +56,17 @@ public class SwarmSimulation {
 
     private IController controller;
     private Camera camera;
-    private DefaultView view;
+    private DefaultView simulationView;
     private IScene scene;
 
     private CopyOnWriteArrayList<ISimulationObject> simulationObjects;
 
     private FPSCounter fpsCounter = new FPSCounter();
-    private Label fpsLabel;
+    private InformationCollectorWidget informationCollectorWidget;
+
+    private int numberOfMeshes;
+    private float newNumberOfObjects = (int) initialNumberOfObjects;
+    private float numberOfObjects = (int) initialNumberOfObjects;
 
     /*****************************/
 
@@ -94,9 +99,6 @@ public class SwarmSimulation {
                     case IKeyEvent.VK_R:
                         camera.setPosition(default_camera_location);
                         break;
-                    case IKeyEvent.VK_H:
-                        printHelp(HELP);
-                        break;
                     default:
                         super.keyPressed(e);
                 }
@@ -109,27 +111,31 @@ public class SwarmSimulation {
             camera.setPosition(default_camera_location);
             camera.setUp(new Vec3(0, 0, 1));
 
-            view = new DefaultView(controller, 100, 100, 500, 500, IView.INTERACTIVE_VIEW, "Swarm Simulation");
+            simulationView = new DefaultView(controller, screenPositionX, screenPositionY, screenWidth, screenHeight, IView.INTERACTIVE_VIEW, "Swarm Simulation");
 
             // Create scene
             scene = new DefaultScene(controller);
             controller.setScene(scene);
 
-            //add camera
+            // add camera
             scene.add3DObject(camera);
-            controller.setCamera(view, camera);
+            controller.setCamera(simulationView, camera);
 
-            // Add an exit button
-            controller.getUI().addWidget(new PushButton(0, 0, "Quit", "Quit", KeyEvent.VK_ESCAPE, (button, v) -> System.exit(0)));
+            // Add exit button
+            controller.getUI().addWidget(new SwarmButton(0, 0, "Quit", "", KeyEvent.VK_ESCAPE, (button, v) -> System.exit(0)));
 
-            //Add fps
-            fpsLabel = new Label(5, controller.getUI().getHeight() - 60, "FPS", "FPS Counter");
-            controller.getUI().addWidget(fpsLabel);
+            // Add information collector
+            informationCollectorWidget = new InformationCollectorWidget(5, controller.getUI().getHeight() - 120, "Information", "");
+            controller.getUI().addWidget(informationCollectorWidget);
+
+            // add Slider
+            Slider slider = new Slider(0, 1, "Objects", "", 1 / (maxNumberOfObjects / numberOfObjects), (s, view) -> newNumberOfObjects = (s.getValue() * maxNumberOfObjects));
+            controller.getUI().addWidget(slider);
 
             // count the camera system
             controller.repaint();
 
-            //initialseGameObjects
+            // initialise GameObjects
             initialiseScene();
         });
     }
@@ -138,10 +144,9 @@ public class SwarmSimulation {
         scene.add3DObject(EtherGLUtil.createBox(new Vec3(100, 100, 100)));
 
         //create initial scene
-        for (int i = 0; i < 200; i++) {
+        for (int i = 0; i < initialNumberOfObjects; i++) {
             //start at 50, 50, 50
-            Vec3 distr = EtherGLUtil.randomVec3().scale(5f);
-            addSimulationObject(new Particle(distr.add(new Vec3(50, 50, 50)), "Gen (" + i + ")"));
+            addSimulationObject(i);
         }
     }
 
@@ -151,12 +156,30 @@ public class SwarmSimulation {
     public void run() {
         //main simulation loop
         controller.animate((time, interval) -> {
-            updateFPS();
+            // update information collector
+            updateInformationCollector();
 
-            //count simulation logic for each element
+            // update slider and objects in the scene
+            updateNumberOfObjects();
+
+            // count simulation logic for each element
             update();
         });
     }
+
+    private void updateNumberOfObjects() {
+        int change = (int) (newNumberOfObjects - numberOfObjects);
+
+        if (change > 0) {
+            for (int i = change; i > 0; i--) {
+                addSimulationObject(change);
+                numberOfObjects++;
+            }
+        } else if(change < 0){
+            removeSimulationObjects(Math.abs(change));
+        }
+    }
+
 
     /**
      * Updates all simulation objects.
@@ -167,22 +190,40 @@ public class SwarmSimulation {
         }
     }
 
-    private void updateFPS()
-    {
+    private void updateInformationCollector() {
         fpsCounter.count();
-        fpsLabel.setText("FPS: " + fpsCounter.getFps());
+        informationCollectorWidget.setFps(fpsCounter.getFps());
+        informationCollectorWidget.setMeshesCounter(numberOfMeshes);
+        informationCollectorWidget.setObjectsCounter((int) numberOfObjects);
         controller.getUI().updateRequest();
     }
 
-    /**
-     * Adds a new simulation object to the simulation.
-     *
-     * @param obj Object to add
-     */
-    private void addSimulationObject(ISimulationObject obj) {
-        simulationObjects.add(obj);
+    private void addSimulationObject(float name) {
+        Vec3 distr = EtherGLUtil.randomVec3().scale(5f);
+        Vec3 startVec = new Vec3(50, 50, 50);
 
-        for (IMesh m : obj.getMeshes())
+        Particle particle = new Particle(distr.add(startVec), "Gen (" + (int) name + ")");
+        simulationObjects.add(particle);
+
+        for (IMesh m : particle.getMeshes()) {
             scene.add3DObject(m);
+            numberOfMeshes++;
+        }
+    }
+
+    private void removeSimulationObjects(float number) {
+        for(int i = 1; i < number + 1; i++) {
+            int index = (int) numberOfObjects - i;
+
+            ISimulationObject o = simulationObjects.get(index);
+            simulationObjects.remove(o);
+
+            for (IMesh m : o.getMeshes()) {
+                scene.remove3DObject(m);
+                numberOfMeshes--;
+            }
+        }
+
+        numberOfObjects -= number;
     }
 }

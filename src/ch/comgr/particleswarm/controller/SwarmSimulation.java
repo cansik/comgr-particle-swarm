@@ -6,6 +6,7 @@ import ch.comgr.particleswarm.ui.InformationCollectorWidget;
 import ch.comgr.particleswarm.ui.SwarmButton;
 import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.comgr.particleswarm.util.FPSCounter;
+import ch.comgr.particleswarm.util.UpdateEventArgs;
 import ch.fhnw.ether.controller.DefaultController;
 import ch.fhnw.ether.controller.IController;
 import ch.fhnw.ether.controller.event.IKeyEvent;
@@ -46,7 +47,7 @@ public class SwarmSimulation extends JFrame {
     private static final int screenWidth = 800;
     private static final int screenHeight = 800;
     private static final int maxNumberOfObjects = 1000;
-    private static final float initialNumberOfObjects = 200;
+    private static final float initialNumberOfObjects = 15;
     // default camera location Vec3
     private static final Vec3 default_camera_location = new Vec3(200, 200, 100);
 
@@ -65,8 +66,27 @@ public class SwarmSimulation extends JFrame {
     private InformationCollectorWidget informationCollectorWidget;
 
     private int numberOfMeshes;
-    private float newNumberOfObjects = (int) initialNumberOfObjects;
     private float numberOfObjects = (int) initialNumberOfObjects;
+
+    /***************
+     * Parameter Variables
+     ***************/
+
+    private float newNumberOfObjects = (int) initialNumberOfObjects;
+
+    private float maxSpeed = 0.5f;
+    private float maxForce = 0.03f;
+
+    private float separationWeight = 1.5f;
+    private float alignmentWeight = 1.0f;
+    private float cohesionWeight = 1.0f;
+
+    private float desiredSeparation = 5.0f;
+    private float neighbourRadius = 15.0f;
+
+    private float boxWidth = 100f;
+    private float boxHeight = 100f;
+    private float boxDepth = 100f;
 
     /*****************************/
 
@@ -185,8 +205,22 @@ public class SwarmSimulation extends JFrame {
      * Updates all simulation objects.
      */
     private void update() {
+        // create update event args
+        UpdateEventArgs args = new UpdateEventArgs(
+                maxSpeed,
+                maxForce,
+                separationWeight,
+                alignmentWeight,
+                cohesionWeight,
+                desiredSeparation,
+                neighbourRadius,
+                boxWidth,
+                boxHeight,
+                boxDepth,
+                new ArrayList<>(simulationObjects));
+
         for (ISimulationObject o : simulationObjects) {
-            o.update(new ArrayList<>(simulationObjects));
+            o.update(args);
         }
     }
 

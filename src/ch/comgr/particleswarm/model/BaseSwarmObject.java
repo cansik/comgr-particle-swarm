@@ -2,6 +2,7 @@ package ch.comgr.particleswarm.model;
 
 import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.comgr.particleswarm.util.Tuple;
+import ch.comgr.particleswarm.util.UpdateEventArgs;
 import ch.fhnw.util.math.Vec3;
 
 import java.util.ArrayList;
@@ -15,20 +16,7 @@ import static ch.comgr.particleswarm.util.EtherGLUtil.equalVec3;
  */
 public abstract class BaseSwarmObject {
 
-    //todo: change this default values in the UI
-    private static final float MAX_SPEED = 0.5f;
-    private static final float MAX_FORCE = 0.03f;
-
-    private static final float SEPARATION_WEIGHT = 1.5f;
-    private static final float ALIGNMENT_WEIGHT = 1.0f;
-    private static final float COHESION_WEIGHT = 1.0f;
-
-    private static final float DESIRED_SEPARATION = 5f;
-    public static final float NEIGHBOUR_RADIUS = 15f;
-
-    private static final float BOX_WIDTH = 100;
-    private static final float BOX_HEIGHT = 100;
-    private static final float BOX_DEPTH = 100;
+    private UpdateEventArgs args;
 
     float angle;
     Vec3 position;
@@ -54,26 +42,28 @@ public abstract class BaseSwarmObject {
     /**
      * Performs next step for this Swarm Object and updates position and velocity.
      *
-     * @param simulationObjects List of objects in the simulation
+     * @param args Simulation arguments.
      */
-    public void nextStep(List<ISimulationObject> simulationObjects) {
-        //todo: check if lambda is fast enough!
+    public void nextStep(UpdateEventArgs args) {
+        //set arguments
+        this.args = args;
+
         //get swarm
         swarm = new ArrayList<>();
 
-        for (ISimulationObject sim : simulationObjects)
+        for (ISimulationObject sim : args.getSimulationObjects())
             if (sim instanceof BaseSwarmObject)
                 swarm.add((BaseSwarmObject) sim);
 
         //get neighbours
-        neighbours = getNeighbours(NEIGHBOUR_RADIUS);
+        neighbours = getNeighbours(args.getNeighbourRadius());
 
         //calculate new acceleration
         Vec3 acceleration = calculateAcceleration();
 
         //apply acceleration to velocity and count position
         velocity = velocity.add(acceleration);
-        velocity = EtherGLUtil.limit(velocity, MAX_SPEED);
+        velocity = EtherGLUtil.limit(velocity, args.getMaxSpeed());
 
         position = position.add(velocity);
         checkBorders();
@@ -91,9 +81,9 @@ public abstract class BaseSwarmObject {
         Vec3 cohesion = calculateCohesion();
 
         //weight the forces
-        separation = separation.scale(SEPARATION_WEIGHT);
-        alignment = alignment.scale(ALIGNMENT_WEIGHT);
-        cohesion = cohesion.scale(COHESION_WEIGHT);
+        separation = separation.scale(args.getSeparationWeight());
+        alignment = alignment.scale(args.getAlignmentWeight());
+        cohesion = cohesion.scale(args.getCohesionWeight());
 
         //generate acceleration
         Vec3 acceleration = Vec3.ZERO;
@@ -122,9 +112,9 @@ public abstract class BaseSwarmObject {
         if (y < -r) v2 *= -1;
         if (z < -r) v3 *= -1;
 
-        if (x > BOX_WIDTH + r) v1 *= -1;
-        if (y > BOX_HEIGHT + r) v2 *= -1;
-        if (z > BOX_DEPTH + r) v3 *= -1;
+        if (x > args.getBoxWidth() + r) v1 *= -1;
+        if (y > args.getBoxHeight() + r) v2 *= -1;
+        if (z > args.getBoxDepth() + r) v3 *= -1;
 
         velocity = new Vec3(v1, v2, v3);
     }
@@ -140,13 +130,13 @@ public abstract class BaseSwarmObject {
         float y = position.y;
         float z = position.z;
 
-        if (x < -r) x = BOX_WIDTH + r;
-        if (y < -r) y = BOX_HEIGHT + r;
-        if (z < -r) z = BOX_DEPTH + r;
+        if (x < -r) x = args.getBoxWidth() + r;
+        if (y < -r) y = args.getBoxHeight() + r;
+        if (z < -r) z = args.getBoxDepth() + r;
 
-        if (x > BOX_WIDTH + r) x = -r;
-        if (y > BOX_HEIGHT + r) y = -r;
-        if (z > BOX_DEPTH + r) z = -r;
+        if (x > args.getBoxWidth() + r) x = -r;
+        if (y > args.getBoxHeight() + r) y = -r;
+        if (z > args.getBoxDepth() + r) z = -r;
 
         position = new Vec3(x, y, z);
     }
@@ -173,10 +163,10 @@ public abstract class BaseSwarmObject {
         Vec3 desired = target.subtract(position);
 
         desired = desired.normalize();
-        desired = desired.scale(MAX_SPEED);
+        desired = desired.scale(args.getMaxSpeed());
 
         Vec3 steer = desired.subtract(velocity);
-        steer = EtherGLUtil.limit(steer, MAX_FORCE);
+        steer = EtherGLUtil.limit(steer, args.getMaxForce());
 
         return steer;
     }
@@ -195,7 +185,7 @@ public abstract class BaseSwarmObject {
         int neighbourCount = 0;
 
         for (Tuple<BaseSwarmObject, Float> n : neighbours) {
-            if (n.getSecond() > DESIRED_SEPARATION)
+            if (n.getSecond() > args.getDesiredSeparation())
                 continue;
 
             Vec3 diff = position.subtract(n.getFirst().position);
@@ -214,10 +204,10 @@ public abstract class BaseSwarmObject {
         if (direction.length() > 0) {
             direction = direction.scale(1.0f / neighbourCount)
                     .normalize()
-                    .scale(MAX_SPEED)
+                    .scale(args.getMaxSpeed())
                     .subtract(velocity);
 
-            direction = EtherGLUtil.limit(direction, MAX_FORCE);
+            direction = EtherGLUtil.limit(direction, args.getMaxForce());
         }
         return direction;
     }
@@ -238,10 +228,10 @@ public abstract class BaseSwarmObject {
 
         direction = direction.scale(1.0f / neighbours.size())
                 .normalize()
-                .scale(MAX_SPEED)
+                .scale(args.getMaxSpeed())
                 .subtract(velocity);
 
-        direction = EtherGLUtil.limit(direction, MAX_FORCE);
+        direction = EtherGLUtil.limit(direction, args.getMaxForce());
 
         return direction;
     }

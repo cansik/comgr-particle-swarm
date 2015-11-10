@@ -2,6 +2,7 @@ package ch.comgr.particleswarm.model;
 
 import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.comgr.particleswarm.util.ObjectLoader;
+import ch.comgr.particleswarm.util.UpdateEventArgs;
 import ch.fhnw.ether.scene.mesh.IMesh;
 import ch.fhnw.util.math.Mat4;
 import ch.fhnw.util.math.Vec3;
@@ -24,15 +25,16 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
         //cube mash
         //meshes.add(MeshLibrary.createCube());
 
-        meshes.add(EtherGLUtil.createSquarePyramid(5));
-        meshes.add(EtherGLUtil.createLine(velocity, 20));
+        //meshes.add(EtherGLUtil.createSquarePyramid(5));
+        //meshes.add(EtherGLUtil.createLine(velocity, 20));
 
-        //meshes.add(EtherGLUtil.createSphere(1));
+        meshes.add(EtherGLUtil.createSphere(1));
 
         //add sphere mash instead of cube
         //meshes.add(EtherGLUtil.createSphere(1));
 
         // ad meshed from obj
+        //getAndAddMeshesFromObj("spaceship.obj");
         //getAndAddMeshesFromObj("bunny.obj");
 
         //set name
@@ -84,8 +86,8 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
     }
 
     @Override
-    public void update(List<ISimulationObject> simulationObjects) {
-        super.nextStep(simulationObjects);
+    public void update(UpdateEventArgs args) {
+        super.nextStep(args);
 
         /*
         // crashes visualVM

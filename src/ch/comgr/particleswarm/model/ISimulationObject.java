@@ -1,5 +1,6 @@
 package ch.comgr.particleswarm.model;
 
+import ch.comgr.particleswarm.util.UpdateEventArgs;
 import ch.fhnw.ether.scene.mesh.IMesh;
 
 import java.util.List;
@@ -21,8 +22,8 @@ public interface ISimulationObject {
     /**
      * Method to count a simulation object.
      *
-     * @param simulationObjects A list of all simulations object to interact with
+     * @param args Simulation arguments.
      */
-    void update(List<ISimulationObject> simulationObjects);
+    void update(UpdateEventArgs args);
 
 }

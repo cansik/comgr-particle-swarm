@@ -1,6 +1,6 @@
 package ch.comgr.particleswarm.gui;
 
 @FunctionalInterface
-interface ParameterChangedListener{
+public interface ParameterChangedListener{
     void action(Parameters p);
 }

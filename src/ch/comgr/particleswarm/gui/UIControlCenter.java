@@ -7,27 +7,30 @@ import java.awt.event.KeyListener;
 import java.util.*;
 
 public class UIControlCenter {
-    private final java.util.List<ParameterInformation> parameters;
+    private final java.util.List<ParameterInformation> parameters = new LinkedList<ParameterInformation>();
     private final JFrame frame = new JFrame("ParticleSwarm Control Center");
-    private final HashSet<ParameterChangedListener> listeners;
+    private final HashSet<ParameterChangedListener> listeners = new HashSet<ParameterChangedListener>();
+    private final boolean debug = false;
 
     public UIControlCenter(){
-        listeners = new HashSet<ParameterChangedListener>();
-        parameters = new LinkedList<ParameterInformation>();
-        parameters.add(new ParameterInformation(Parameters.MaxNumberOfObjects, 1000, s -> Integer.parseInt(s)));
-
-        // Test
-        listeners.add(s -> {
-            System.out.println(s.name());
-            System.out.println(getParameterInformation(s).Value);
-        });
+        definingParametersForGuiControl();
+        parameters.stream().forEach(p -> createControl(p));
     }
-    public void createAndShow(){
 
+    public void addParameterChangedListener(ParameterChangedListener l){
+        if(listeners.contains(l)) return;
+        listeners.add(l);
+    }
+
+    public void createAndShow(){
         frame.setSize(new Dimension(300, 800));
         frame.setLayout(new GridLayout(0,2));
-        createControl(parameters.get(0));
         frame.setVisible(true);
+    }
+
+    private void definingParametersForGuiControl(){
+        parameters.add(new ParameterInformation(Parameters.MaxNumberOfObjects, 1000, s -> Integer.parseInt(s)));
+        parameters.add(new ParameterInformation(Parameters.AlignmentWeight, 2.3f, s -> Double.parseDouble(s)));
     }
 
     public ParameterInformation getParameterInformation(Parameters p){
@@ -46,8 +49,13 @@ public class UIControlCenter {
     }
 
     private void propagateChange(ParameterInformation p){
-        if(listeners.size() == 0) return;
+        if(listeners.size() == 0)
+            return;
+
         listeners.forEach(l -> l.action(p.Parameter));
+
+        if(debug)
+            System.out.println(p.Parameter.name() + ": "+ getParameterInformation(p.Parameter).Value);
     }
 
     private class CustomKeyListener implements KeyListener{

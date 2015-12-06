@@ -159,9 +159,9 @@ class Boid {
 
   // We accumulate a new acceleration each time based on three rules
   void flock(ArrayList<Boid> boids, ArrayList<Obstacle> obstacles) {
-    PVector sep =  new PVector(); //separate(boids);   // Separation
-    PVector ali =new PVector(); //align(boids);      // Alignment
-    PVector coh = new PVector(); //cohesion(boids);   // Cohesion
+    PVector sep =  separate(boids);   // Separation
+    PVector ali = align(boids);      // Alignment
+    PVector coh = cohesion(boids);   // Cohesion
 
     PVector rep = repulsion(obstacles); // Repulsion
 
@@ -261,7 +261,7 @@ class Boid {
       {
         //draw for debugging
         stroke(204, 255, 255);
-        //line(location.x, location.y, nearest.x, nearest.y);
+        line(location.x, location.y, nearest.x, nearest.y);
 
         PVector seek = seek(nearest);
         seek.mult(min(breakConstant/dist, Float.MAX_VALUE));
@@ -325,6 +325,12 @@ class Boid {
     for (Boid other : boids) {
       float d = PVector.dist(location, other.location);
       if ((d > 0) && (d < neighbordist)) {
+        
+        //draw 
+        strokeWeight(0.5);
+        stroke(100, 255, 0);
+        line(location.x, location.y, other.location.x, other.location.y);
+        
         sum.add(other.velocity);
         count++;
       }

@@ -4,6 +4,7 @@ import ch.comgr.particleswarm.model.ISimulationObject;
 import ch.comgr.particleswarm.model.Particle;
 import ch.comgr.particleswarm.ui.InformationCollectorWidget;
 import ch.comgr.particleswarm.ui.SwarmButton;
+import ch.comgr.particleswarm.ui.SwarmSlider;
 import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.comgr.particleswarm.util.FPSCounter;
 import ch.comgr.particleswarm.util.UpdateEventArgs;
@@ -59,6 +60,7 @@ public class SwarmSimulation extends JFrame {
     private Camera camera;
     private DefaultView simulationView;
     private IScene scene;
+    private IMesh box;
 
     private CopyOnWriteArrayList<ISimulationObject> simulationObjects;
 
@@ -67,6 +69,8 @@ public class SwarmSimulation extends JFrame {
 
     private int numberOfMeshes;
     private float numberOfObjects = (int) initialNumberOfObjects;
+
+    private boolean showController = true;
 
     /***************
      * Parameter Variables
@@ -77,11 +81,11 @@ public class SwarmSimulation extends JFrame {
     private float maxSpeed = 0.5f;
     private float maxForce = 0.03f;
 
-    private float separationWeight = 1.5f;
+    private volatile float separationWeight = 1.5f;
     private float alignmentWeight = 1.0f;
     private float cohesionWeight = 1.0f;
 
-    private float desiredSeparation = 5.0f;
+    private volatile float desiredSeparation = 5.0f;
     private float neighbourRadius = 15.0f;
 
     private float boxWidth = 100f;
@@ -119,6 +123,17 @@ public class SwarmSimulation extends JFrame {
                     case IKeyEvent.VK_R:
                         camera.setPosition(default_camera_location);
                         break;
+                    case IKeyEvent.VK_B:
+                        if(showController) {
+                            controller.getUI().disable();
+                            showController = false;
+                        }
+                        else
+                        {
+                            controller.getUI().enable();
+                            showController = true;
+                        }
+                        break;
                     default:
                         super.keyPressed(e);
                 }
@@ -152,6 +167,9 @@ public class SwarmSimulation extends JFrame {
             Slider slider = new Slider(0, 1, "Objects", "", 1 / (maxNumberOfObjects / numberOfObjects), (s, view) -> newNumberOfObjects = (s.getValue() * maxNumberOfObjects));
             controller.getUI().addWidget(slider);
 
+            SwarmSlider desiredSeparationSlider = new SwarmSlider(0, 3, "Desired Separation", "", 1 / desiredSeparation, 0f, 20f, (s, view) -> desiredSeparation = s.getValue());
+            controller.getUI().addWidget(desiredSeparationSlider);
+
             // count the camera system
             controller.repaint();
 
@@ -161,7 +179,8 @@ public class SwarmSimulation extends JFrame {
     }
 
     public void initialiseScene() {
-        scene.add3DObject(EtherGLUtil.createBox(new Vec3(100, 100, 100)));
+        box = EtherGLUtil.createBox(new Vec3(100, 100, 100));
+        scene.add3DObject(box);
 
         //create initial scene
         for (int i = 0; i < initialNumberOfObjects; i++) {

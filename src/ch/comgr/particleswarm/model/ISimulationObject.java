@@ -2,6 +2,7 @@ package ch.comgr.particleswarm.model;
 
 import ch.comgr.particleswarm.util.UpdateEventArgs;
 import ch.fhnw.ether.scene.mesh.IMesh;
+import ch.fhnw.util.math.Vec3;
 
 import java.util.List;
 
@@ -25,5 +26,4 @@ public interface ISimulationObject {
      * @param args Simulation arguments.
      */
     void update(UpdateEventArgs args);
-
 }

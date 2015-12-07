@@ -1,5 +1,6 @@
 package ch.comgr.particleswarm.util;
 
+import ch.comgr.particleswarm.model.CollisionObject;
 import ch.comgr.particleswarm.model.ISimulationObject;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class UpdateEventArgs {
     private final float boxDepth;
 
     private final List<ISimulationObject> simulationObjects;
+    private final List<CollisionObject> collisionObjects;
 
     public UpdateEventArgs(float maxSpeed,
                            float maxForce,
@@ -34,7 +36,8 @@ public class UpdateEventArgs {
                            float boxWidth,
                            float boxHeight,
                            float boxDepth,
-                           List<ISimulationObject> simulationObjects)
+                           List<ISimulationObject> simulationObjects,
+                           List<CollisionObject> collisionObjects)
     {
         this.maxSpeed = maxSpeed;
         this.maxForce = maxForce;
@@ -47,6 +50,7 @@ public class UpdateEventArgs {
         this.boxHeight = boxHeight;
         this.boxDepth = boxDepth;
         this.simulationObjects = simulationObjects;
+        this.collisionObjects = collisionObjects;
     }
 
     public float getMaxSpeed() {
@@ -91,5 +95,9 @@ public class UpdateEventArgs {
 
     public List<ISimulationObject> getSimulationObjects() {
         return simulationObjects;
+    }
+
+    public List<CollisionObject> getCollisionObjects() {
+        return collisionObjects;
     }
 }

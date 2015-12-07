@@ -1,5 +1,6 @@
 package ch.comgr.particleswarm.controller;
 
+import ch.comgr.particleswarm.model.CollisionObject;
 import ch.comgr.particleswarm.model.ISimulationObject;
 import ch.comgr.particleswarm.model.Particle;
 import ch.comgr.particleswarm.ui.InformationCollectorWidget;
@@ -63,6 +64,7 @@ public class SwarmSimulation extends JFrame {
     private IMesh box;
 
     private CopyOnWriteArrayList<ISimulationObject> simulationObjects;
+    private CopyOnWriteArrayList<CollisionObject> collisionObjects;
 
     private FPSCounter fpsCounter = new FPSCounter();
     private InformationCollectorWidget informationCollectorWidget;
@@ -96,6 +98,7 @@ public class SwarmSimulation extends JFrame {
 
     public SwarmSimulation() {
         simulationObjects = new CopyOnWriteArrayList<>();
+        collisionObjects = new CopyOnWriteArrayList<>();
 
         // Create controller
         controller = new DefaultController() {
@@ -159,15 +162,18 @@ public class SwarmSimulation extends JFrame {
             // Add exit button
             controller.getUI().addWidget(new SwarmButton(0, 0, "Quit", "", KeyEvent.VK_ESCAPE, (button, v) -> System.exit(0)));
 
+            // Add object button
+            controller.getUI().addWidget(new SwarmButton(1, 0, "New", "", KeyEvent.VK_N, (button, v) -> addNewCollisionObject()));
+
             // Add information collector
-            informationCollectorWidget = new InformationCollectorWidget(5, controller.getUI().getHeight() - 120, "Information", "");
+            informationCollectorWidget = new InformationCollectorWidget(5, controller.getUI().getHeight() - 180, "Information", "");
             controller.getUI().addWidget(informationCollectorWidget);
 
             // add Slider
             Slider slider = new Slider(0, 1, "Objects", "", 1 / (maxNumberOfObjects / numberOfObjects), (s, view) -> newNumberOfObjects = (s.getValue() * maxNumberOfObjects));
             controller.getUI().addWidget(slider);
 
-            SwarmSlider desiredSeparationSlider = new SwarmSlider(0, 3, "Desired Separation", "", 1 / desiredSeparation, 0f, 20f, (s, view) -> desiredSeparation = s.getValue());
+            SwarmSlider desiredSeparationSlider = new SwarmSlider(0, 2, "Desired Separation", "", 1 / desiredSeparation, 0f, 20f, (s, view) -> desiredSeparation = s.getValue());
             controller.getUI().addWidget(desiredSeparationSlider);
 
             // count the camera system
@@ -179,8 +185,7 @@ public class SwarmSimulation extends JFrame {
     }
 
     public void initialiseScene() {
-        box = EtherGLUtil.createBox(new Vec3(100, 100, 100));
-        scene.add3DObject(box);
+        scene.add3DObject(EtherGLUtil.createBox(new Vec3(100, 100, 100)).getFirst());
 
         //create initial scene
         for (int i = 0; i < initialNumberOfObjects; i++) {
@@ -236,7 +241,8 @@ public class SwarmSimulation extends JFrame {
                 boxWidth,
                 boxHeight,
                 boxDepth,
-                new ArrayList<>(simulationObjects));
+                new ArrayList<>(simulationObjects),
+                new ArrayList<>(collisionObjects));
 
         for (ISimulationObject o : simulationObjects) {
             o.update(args);
@@ -249,6 +255,19 @@ public class SwarmSimulation extends JFrame {
         informationCollectorWidget.setMeshesCounter(numberOfMeshes);
         informationCollectorWidget.setObjectsCounter((int) numberOfObjects);
         controller.getUI().updateRequest();
+    }
+
+    private void addNewCollisionObject() {
+        Vec3 distr = EtherGLUtil.randomVec3().scale(40f);
+        Vec3 startVec = new Vec3(50, 50, 50);
+
+        CollisionObject object = new CollisionObject(distr.add(startVec), "Collision object");
+        collisionObjects.add(object);
+
+        for (IMesh m : object.getMeshes()) {
+            scene.add3DObject(m);
+            numberOfMeshes++;
+        }
     }
 
     private void addSimulationObject(float name) {

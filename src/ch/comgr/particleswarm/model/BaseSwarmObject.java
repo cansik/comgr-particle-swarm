@@ -3,27 +3,33 @@ package ch.comgr.particleswarm.model;
 import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.comgr.particleswarm.util.Tuple;
 import ch.comgr.particleswarm.util.UpdateEventArgs;
+import ch.fhnw.ether.scene.I3DObject;
+import ch.fhnw.util.UpdateRequest;
 import ch.fhnw.util.math.Vec3;
+import ch.fhnw.util.math.geometry.BoundingBox;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static ch.comgr.particleswarm.util.EtherGLUtil.equalVec3;
 
 /**
  * Created by cansik on 24/10/15.
  */
-public abstract class BaseSwarmObject {
+public abstract class BaseSwarmObject implements I3DObject {
 
     private UpdateEventArgs args;
 
     float angle;
     Vec3 position;
     Vec3 velocity;
+    String name;
 
     private List<BaseSwarmObject> swarm;
     private List<Tuple<BaseSwarmObject, Float>> neighbours;
+    private List<Vec3> vertices;
+
+    private BoundingBox boundingBox;
 
     /**
      * Creates a new Swarm Object which try's to align to other objects.
@@ -38,6 +44,23 @@ public abstract class BaseSwarmObject {
         //set velocity to initial amount
         velocity = EtherGLUtil.randomVec3();
     }
+
+
+    public void updateBoundingBox() {
+        boundingBox = new BoundingBox();
+        //initBoundingBox
+        for(Vec3 vec : vertices) {
+            boundingBox.add(position.x + vec.x, position.y + vec.y, position.z + vec.z);
+        }
+    }
+
+    public void setVertices(List<Vec3> vertices) {
+        assert vertices != null;
+        this.vertices = vertices;
+
+        updateBoundingBox();
+    }
+
 
     /**
      * Performs next step for this Swarm Object and updates position and velocity.
@@ -299,5 +322,37 @@ public abstract class BaseSwarmObject {
         assert res == res2;
 
         return res2;
+    }
+
+    @Override
+    public BoundingBox getBounds() {
+        assert boundingBox != null;
+
+        return boundingBox;
+    }
+
+    @Override
+    public Vec3 getPosition() {
+        return position;
+    }
+
+    @Override
+    public void setPosition(Vec3 vec3) {
+        this.position = vec3;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String s) {
+        this.name = s;
+    }
+
+    @Override
+    public UpdateRequest getUpdater() {
+        return null;
     }
 }

@@ -11,6 +11,8 @@ import ch.fhnw.util.math.Mat4;
 import ch.fhnw.util.math.Vec3;
 import ch.fhnw.util.math.geometry.GeodesicSphere;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -116,25 +118,98 @@ public class EtherGLUtil {
      * @param size Size of the box
      * @return Box mesh
      */
-    public static IMesh createBox(Vec3 size) {
-        float[] vertices = {0, 0, 0, size.x, 0, 0,
-                0, 0, 0, 0, size.y, 0,
-                0, 0, 0, 0, 0, size.z,
-                size.x, 0, 0, size.x, size.y, 0,
-                size.x, 0, 0, size.x, 0, size.z,
-                0, size.y, 0, size.x, size.y, 0,
-                0, size.y, 0, 0, size.y, size.z,
-                0, 0, size.z, size.x, 0, size.z,
-                0, 0, size.z, 0, size.y, size.z,
-                size.x, 0, size.z, size.x, size.y, size.z,
-                0, size.y, size.z, size.x, size.y, size.z,
-                size.x, size.y, 0, size.x, size.y, size.z
+    public static Tuple<IMesh, List<Vec3>> createBox(Vec3 size) {
+        float[] vertices = {
+                0, 0, 0,
+                size.x, 0, 0,
+                0, 0, 0,
+                0, size.y, 0,
+                0, 0, 0,
+                0, 0, size.z,
+                size.x, 0, 0,
+                size.x, size.y, 0,
+                size.x, 0, 0,
+                size.x, 0, size.z,
+                0, size.y, 0,
+                size.x, size.y, 0,
+                0, size.y, 0,
+                0, size.y, size.z,
+                0, 0, size.z,
+                size.x, 0, size.z,
+                0, 0, size.z,
+                0, size.y, size.z,
+                size.x, 0, size.z,
+                size.x, size.y, size.z,
+                0, size.y, size.z,
+                size.x, size.y, size.z,
+                size.x, size.y, 0,
+                size.x, size.y, size.z
         };
+
+        List<Vec3> vertexes = new ArrayList<>();
+
+        for(int i = 0; i < vertices.length; i+=3)
+            vertexes.add(new Vec3(vertices[i], vertices[i+1], vertices[i+2]));
+
         IMesh box = new DefaultMesh(new LineMaterial(new RGBA(1f, 1f, 0.5f, 1)),
                 DefaultGeometry.createV(IGeometry.Primitive.LINES,
                         vertices),
                 IMesh.Queue.DEPTH);
-        return box;
+
+        return new Tuple(box, vertexes);
+    }
+
+    /**
+     * Creates 3d grid box.
+     *
+     * @param size Size of the box
+     * @return Box mesh
+     */
+    public static Tuple<IMesh, List<Vec3>> createSphereBox(Vec3 size) {
+        float[] vertices = {
+                0, 0, 0,
+                size.x, 0, 0,
+                0, 0, 0,
+                0, size.y, 0,
+                0, 0, 0,
+                0, 0, size.z,
+                size.x, 0, 0,
+                size.x, size.y, 0,
+                size.x, 0, 0,
+                size.x, 0, size.z,
+                0, size.y, 0,
+                size.x, size.y, 0,
+                0, size.y, 0,
+                0, size.y, size.z,
+                0, 0, size.z,
+                size.x, 0, size.z,
+                0, 0, size.z,
+                0, size.y, size.z,
+                size.x, 0, size.z,
+                size.x, size.y, size.z,
+                0, size.y, size.z,
+                size.x, size.y, size.z,
+                size.x, size.y, 0,
+                size.x, size.y, size.z
+        };
+
+        List<Vec3> vertexes = new ArrayList<>();
+
+        for(int i = 0; i < vertices.length; i+=3) {
+            // not from center
+            vertices[i] -= size.x/2;
+            vertices[i+1] -= size.y/2;
+            vertices[i+2] -= size.z/2;
+            // add vertices
+            vertexes.add(new Vec3(vertices[i], vertices[i+1], vertices[i+2]));
+        }
+
+        IMesh box = new DefaultMesh(new LineMaterial(new RGBA(1f, 1f, 0.5f, 1)),
+                DefaultGeometry.createV(IGeometry.Primitive.LINES,
+                        vertices),
+                IMesh.Queue.DEPTH);
+
+        return new Tuple(box, vertexes);
     }
 
     public static IMesh createLine(Vec3 position, float length) {
@@ -152,6 +227,7 @@ public class EtherGLUtil {
                 DefaultGeometry.createV(IGeometry.Primitive.LINES,
                         vertices),
                 IMesh.Queue.DEPTH);
+
         return line;
     }
 
@@ -175,10 +251,137 @@ public class EtherGLUtil {
                 -0.5f, -0.5f, d,
                 0.5f, -0.5f, d,
         };
+
         IMesh squarePyramid = new DefaultMesh(new ColorMaterial(new RGBA(0f, 0.5f, 1.0f, 1)),
                 DefaultGeometry.createV(IGeometry.Primitive.TRIANGLES,
                         vertices),
                 IMesh.Queue.DEPTH);
+
         return squarePyramid;
+    }
+
+    public static Tuple<IMesh, List<Vec3>> createFilledBox(Vec3 size) {
+        float[] vertices = {
+                // bottom
+                0, 0, 0,
+                size.x, 0, 0,
+                size.x, size.y, 0,
+                // bottom
+                0,0,0,
+                0,size.y,0,
+                size.x, size.y, 0,
+                // top
+                0, 0, size.z,
+                size.x, 0, size.z,
+                size.x, size.y, size.z,
+                // top
+                0,0,size.z,
+                0,size.y,size.z,
+                size.x, size.y, size.z,
+                // front
+                size.x, 0, 0,
+                size.x, size.y, 0,
+                size.x,size.y,size.z,
+                // front
+                size.x, 0, 0,
+                size.x, size.y, size.z,
+                size.x, 0, size.z,
+                // back
+                0,0,0,
+                0,size.y, 0,
+                0,size.y,size.z,
+                // back
+                0, 0, 0,
+                0, size.y, size.z,
+                0, 0, size.z,
+                // right
+                0,size.y,0,
+                0,size.y,size.z,
+                size.x,size.y,size.z,
+                // right
+                0,size.y,0,
+                size.x, size.y, 0,
+                size.x,size.y,size.z,
+                // left
+                0,0,0,
+                0,0,size.z,
+                size.x,0,size.z,
+                // left
+                0,0,0,
+                size.x, 0, 0,
+                size.x,0,size.z,
+        };
+
+        List<Vec3> vertexes = new ArrayList<>();
+
+        for(int i = 0; i < vertices.length; i+=3)
+            vertexes.add(new Vec3(vertices[i], vertices[i+1], vertices[i+2]));
+
+        IMesh box = new DefaultMesh(new ColorMaterial(new RGBA(0f, 1f, 0f, 1)),
+                DefaultGeometry.createV(IGeometry.Primitive.TRIANGLES,
+                        vertices),
+                IMesh.Queue.DEPTH);
+
+        return new Tuple(box, vertexes);
+    }
+
+    public static List<Vec3> getBoundingBox(Vec3 size) {
+        float[] vertices = {
+                // bottom
+                0, 0, 0,
+                size.x, 0, 0,
+                size.x, size.y, 0,
+                // bottom
+                0,0,0,
+                0,size.y,0,
+                size.x, size.y, 0,
+                // top
+                0, 0, size.z,
+                size.x, 0, size.z,
+                size.x, size.y, size.z,
+                // top
+                0,0,size.z,
+                0,size.y,size.z,
+                size.x, size.y, size.z,
+                // front
+                size.x, 0, 0,
+                size.x, size.y, 0,
+                size.x,size.y,size.z,
+                // front
+                size.x, 0, 0,
+                size.x, size.y, size.z,
+                size.x, 0, size.z,
+                // back
+                0,0,0,
+                0,size.y, 0,
+                0,size.y,size.z,
+                // back
+                0, 0, 0,
+                0, size.y, size.z,
+                0, 0, size.z,
+                // right
+                0,size.y,0,
+                0,size.y,size.z,
+                size.x,size.y,size.z,
+                // right
+                0,size.y,0,
+                size.x, size.y, 0,
+                size.x,size.y,size.z,
+                // left
+                0,0,0,
+                0,0,size.z,
+                size.x,0,size.z,
+                // left
+                0,0,0,
+                size.x, 0, 0,
+                size.x,0,size.z,
+        };
+
+        List<Vec3> vertexes = new ArrayList<>();
+
+        for(int i = 0; i < vertices.length; i+=3)
+            vertexes.add(new Vec3(vertices[i], vertices[i+1], vertices[i+2]));
+
+        return vertexes;
     }
 }

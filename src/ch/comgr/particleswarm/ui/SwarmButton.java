@@ -3,6 +3,7 @@ package ch.comgr.particleswarm.ui;
 import ch.fhnw.ether.controller.event.IPointerEvent;
 import ch.fhnw.ether.ui.Button;
 import ch.fhnw.ether.ui.GraphicsPlane;
+import ch.fhnw.ether.ui.UI;
 
 /**
  * Created by cansik on 05/11/15.
@@ -49,6 +50,16 @@ public class SwarmButton extends Button {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean hit(IPointerEvent e) {
+        int x = e.getX();
+        int y = e.getY();
+        UI ui = getUI();
+        float bx = ui.getX() + getX() * (this.BUTTON_GAP + BUTTON_WIDTH);
+        float by = ui.getY() + getY() * (BUTTON_GAP + BUTTON_HEIGHT);
+        return x >= bx && x <= bx + BUTTON_WIDTH && y >= by && y <= by + BUTTON_HEIGHT;
     }
 
     @Override

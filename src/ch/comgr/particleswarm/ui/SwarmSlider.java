@@ -15,13 +15,15 @@ import java.awt.*;
  */
     public class SwarmSlider extends Slider {
 
-    private static final int SLIDER_WIDTH = 144;
+    private static final int SLIDER_WIDTH = 160;
     private static final int SLIDER_HEIGHT = 24;
 
     private static final int SLIDER_GAP = 8;
 
     private static final Color SLIDER_BG = new Color(1f, 1f, 1f, 0.25f);
     private static final Color SLIDER_FG = new Color(0.6f, 0, 0, 0.75f);
+
+    private Color foregroundColor = this.SLIDER_FG;
 
     private boolean sliding;
     private float value;
@@ -43,13 +45,26 @@ import java.awt.*;
 
     public SwarmSlider(int x, int y, String label, String help, float value, float min, float max, ISliderAction action) {
         super(x, y, label, help, value, action);
-        this.value = value;
+        this.value = value / max;
         this.min = min;
         this.max = max;
     }
 
+    public SwarmSlider(int x, int y, String label, String help, float value, float min, float max, Color foregroundColor, ISliderAction action) {
+        this(x, y, label, help, value, min, max, action);
+        this.foregroundColor = foregroundColor;
+    }
+
     public float getValue() {
         return value*this.max;
+    }
+
+    public Color getForegroundColor() {
+        return foregroundColor;
+    }
+
+    public void setForegroundColor(Color foregroundColor) {
+        this.foregroundColor = foregroundColor;
     }
 
     @Override
@@ -70,10 +85,10 @@ import java.awt.*;
         int bx = getX() * (bg + bw);
         int by = getY() * (bg + bh);
         surface.fillRect(SLIDER_BG, bx + 4, surface.getHeight() - by - bh - 4, bw, bh);
-        surface.fillRect(SLIDER_FG, bx + 4, surface.getHeight() - by - bh - 4, (int) (value * bw), bh);
+        surface.fillRect(foregroundColor, bx + 4, surface.getHeight() - by - bh - 4, (int) (value * bw), bh);
         String label = getLabel();
         if (label != null) {
-            label += " (" + Math.round(getValue()) +  ") ";
+            label += " (" + Math.round(getValue()*100.0)/100.0 +  ") ";
             surface.drawString(TEXT_COLOR, label, bx + 6, surface.getHeight() - by - 8);
         }
     }

@@ -24,6 +24,7 @@ import ch.fhnw.ether.view.gl.DefaultView;
 import ch.fhnw.util.math.Vec3;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -80,9 +81,9 @@ public class SwarmSimulation extends JFrame {
      * Parameter Variables
      ***************/
 
-    private float newNumberOfObjects = (int) initialNumberOfObjects;
+    private volatile float newNumberOfObjects = (int) initialNumberOfObjects;
 
-    private float maxSpeed = 0.5f;
+    private volatile float maxSpeed = 0.5f;
     private float maxForce = 0.03f;
 
     private volatile float separationWeight = 1.5f;
@@ -90,7 +91,7 @@ public class SwarmSimulation extends JFrame {
     private volatile float cohesionWeight = 1.0f;
 
     private volatile float desiredSeparation = 5.0f;
-    private float neighbourRadius = 15.0f;
+    private volatile float neighbourRadius = 15.0f;
 
     private float boxWidth = 100f;
     private float boxHeight = 100f;
@@ -174,21 +175,40 @@ public class SwarmSimulation extends JFrame {
             informationCollectorWidget = new InformationCollectorWidget(5, controller.getUI().getHeight() - 180, "Information", "");
             controller.getUI().addWidget(informationCollectorWidget);
 
+            //ui colors
+            Color yellow = new Color(0xEFC94C);
+            Color orange = new Color(0xE27A3F);
+            Color red = new Color(0xDF5A49);
+            Color green = new Color(0x45B29D);
+            Color blue = new Color(0x334D5C);
+
             // add Slider
-            SwarmSlider slider = new SwarmSlider(0, 1, "Objects", "", 1 / (maxNumberOfObjects / numberOfObjects), (s, view) -> newNumberOfObjects = (s.getValue() * maxNumberOfObjects));
+            SwarmSlider slider = new SwarmSlider(0, 1, "Objects", "", numberOfObjects, 0f, maxNumberOfObjects, green, (s, view) -> newNumberOfObjects = (int)s.getValue());
             controller.getUI().addWidget(slider);
 
-            // separation
-            SwarmSlider desiredSeparationSlider = new SwarmSlider(0, 2, "Separation", "", 1 / desiredSeparation, 0f, 20f, (s, view) -> desiredSeparation = s.getValue());
+            // desired separation
+            SwarmSlider desiredSeparationSlider = new SwarmSlider(0, 2, "Des-Separation", "", desiredSeparation, 0f, 20f, red, (s, view) -> desiredSeparation = s.getValue());
             controller.getUI().addWidget(desiredSeparationSlider);
 
+            // desired neighbour radius
+            SwarmSlider neighbourRadiusSlider = new SwarmSlider(0, 3, "Neighbour Radius", "", neighbourRadius, 0f, 25f, red, (s, view) -> neighbourRadius = s.getValue());
+            controller.getUI().addWidget(neighbourRadiusSlider);
+
+            // separation
+            SwarmSlider separationSlider = new SwarmSlider(0, 4, "Separation", "", separationWeight, 0f, 5f, orange, (s, view) -> separationWeight = s.getValue());
+            controller.getUI().addWidget(separationSlider);
+
             // alginment
-            SwarmSlider desiredAlignmentSlider = new SwarmSlider(0, 3, "Alignment", "", 1 / alignmentWeight, 0f, 20f, (s, view) -> alignmentWeight = s.getValue());
-            controller.getUI().addWidget(desiredAlignmentSlider);
+            SwarmSlider alignmentSlider = new SwarmSlider(0, 5, "Alignment", "", alignmentWeight, 0f, 5f, orange, (s, view) -> alignmentWeight = s.getValue());
+            controller.getUI().addWidget(alignmentSlider);
 
             //cohesion
-            SwarmSlider desiredCohesionSlider = new SwarmSlider(0, 4, "Cohesion", "", 1 / cohesionWeight, 0f, 20f, (s, view) -> cohesionWeight = s.getValue());
-            controller.getUI().addWidget(desiredCohesionSlider);
+            SwarmSlider cohesionSlider = new SwarmSlider(0, 6, "Cohesion", "", cohesionWeight, 0f, 5f, orange, (s, view) -> cohesionWeight = s.getValue());
+            controller.getUI().addWidget(cohesionSlider);
+
+            // max speed
+            SwarmSlider maxSpeedSlider = new SwarmSlider(0, 7, "Max Speed", "", maxSpeed, 0f, 2f, yellow, (s, view) -> maxSpeed = s.getValue());
+            controller.getUI().addWidget(maxSpeedSlider);
 
             // count the camera system
             controller.repaint();

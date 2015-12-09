@@ -16,7 +16,7 @@ import java.awt.*;
     public class SwarmSlider extends Slider {
 
     private static final int SLIDER_WIDTH = 144;
-    private static final int SLIDER_HEIGHT = 48;
+    private static final int SLIDER_HEIGHT = 24;
 
     private static final int SLIDER_GAP = 8;
 
@@ -72,8 +72,10 @@ import java.awt.*;
         surface.fillRect(SLIDER_BG, bx + 4, surface.getHeight() - by - bh - 4, bw, bh);
         surface.fillRect(SLIDER_FG, bx + 4, surface.getHeight() - by - bh - 4, (int) (value * bw), bh);
         String label = getLabel();
-        if (label != null)
+        if (label != null) {
+            label += " (" + Math.round(getValue()) +  ") ";
             surface.drawString(TEXT_COLOR, label, bx + 6, surface.getHeight() - by - 8);
+        }
     }
 
     @Override

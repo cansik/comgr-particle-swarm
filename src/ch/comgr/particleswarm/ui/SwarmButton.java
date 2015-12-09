@@ -10,7 +10,7 @@ import ch.fhnw.ether.ui.GraphicsPlane;
 public class SwarmButton extends Button {
 
     private static final int BUTTON_WIDTH = 48;
-    private static final int BUTTON_HEIGHT = 48;
+    private static final int BUTTON_HEIGHT = 24;
 
     private static final int BUTTON_GAP = 8;
 

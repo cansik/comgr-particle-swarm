@@ -86,8 +86,8 @@ public class SwarmSimulation extends JFrame {
     private float maxForce = 0.03f;
 
     private volatile float separationWeight = 1.5f;
-    private float alignmentWeight = 1.0f;
-    private float cohesionWeight = 1.0f;
+    private volatile float alignmentWeight = 1.0f;
+    private volatile float cohesionWeight = 1.0f;
 
     private volatile float desiredSeparation = 5.0f;
     private float neighbourRadius = 15.0f;
@@ -175,11 +175,20 @@ public class SwarmSimulation extends JFrame {
             controller.getUI().addWidget(informationCollectorWidget);
 
             // add Slider
-            Slider slider = new Slider(0, 1, "Objects", "", 1 / (maxNumberOfObjects / numberOfObjects), (s, view) -> newNumberOfObjects = (s.getValue() * maxNumberOfObjects));
+            SwarmSlider slider = new SwarmSlider(0, 1, "Objects", "", 1 / (maxNumberOfObjects / numberOfObjects), (s, view) -> newNumberOfObjects = (s.getValue() * maxNumberOfObjects));
             controller.getUI().addWidget(slider);
 
-            SwarmSlider desiredSeparationSlider = new SwarmSlider(0, 2, "Desired Separation", "", 1 / desiredSeparation, 0f, 20f, (s, view) -> desiredSeparation = s.getValue());
+            // separation
+            SwarmSlider desiredSeparationSlider = new SwarmSlider(0, 2, "Separation", "", 1 / desiredSeparation, 0f, 20f, (s, view) -> desiredSeparation = s.getValue());
             controller.getUI().addWidget(desiredSeparationSlider);
+
+            // alginment
+            SwarmSlider desiredAlignmentSlider = new SwarmSlider(0, 3, "Alignment", "", 1 / alignmentWeight, 0f, 20f, (s, view) -> alignmentWeight = s.getValue());
+            controller.getUI().addWidget(desiredAlignmentSlider);
+
+            //cohesion
+            SwarmSlider desiredCohesionSlider = new SwarmSlider(0, 4, "Cohesion", "", 1 / cohesionWeight, 0f, 20f, (s, view) -> cohesionWeight = s.getValue());
+            controller.getUI().addWidget(desiredCohesionSlider);
 
             // count the camera system
             controller.repaint();

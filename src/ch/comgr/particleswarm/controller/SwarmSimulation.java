@@ -48,7 +48,7 @@ public class SwarmSimulation extends JFrame {
     // screen properties
     private static final int screenPositionX = 10;
     private static final int screenPositionY = 40;
-    private static final int screenWidth = 800;
+    private static final int screenWidth = 1024;
     private static final int screenHeight = 800;
     private static final int maxNumberOfObjects = 1000;
     private static final float initialNumberOfObjects = 15;
@@ -209,6 +209,10 @@ public class SwarmSimulation extends JFrame {
             // max speed
             SwarmSlider maxSpeedSlider = new SwarmSlider(0, 7, "Max Speed", "", maxSpeed, 0f, 2f, yellow, (s, view) -> maxSpeed = s.getValue());
             controller.getUI().addWidget(maxSpeedSlider);
+
+            // max speed
+            SwarmSlider maxForceSlider = new SwarmSlider(0, 8, "Max Force", "", maxForce, 0f, 2f, yellow, (s, view) -> maxForce = s.getValue());
+            controller.getUI().addWidget(maxForceSlider);
 
             // count the camera system
             controller.repaint();

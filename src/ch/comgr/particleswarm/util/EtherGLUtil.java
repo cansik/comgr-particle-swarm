@@ -101,15 +101,19 @@ public class EtherGLUtil {
      * @param size Size of the sphere
      * @return Sphere mash
      */
-    public static IMesh createSphere(float size) {
+    public static IMesh createSphere(float size, RGBA color) {
         GeodesicSphere sphere = new GeodesicSphere(1);
-        IMesh s = new DefaultMesh(new ColorMaterial(new RGBA(0, 1, 1, 0.5f)),
+        IMesh s = new DefaultMesh(new ColorMaterial(color),
                 DefaultGeometry.createV(IGeometry.Primitive.TRIANGLES,
                         sphere.getTriangles()),
                 IMesh.Queue.TRANSPARENCY);
         s.setTransform(Mat4.scale(size));
-        //s.updateRequest();
         return s;
+    }
+
+    public static IMesh createSphere(float size)
+    {
+        return createSphere(size, new RGBA(0, 1, 1, 0.5f));
     }
 
     /**

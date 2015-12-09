@@ -6,6 +6,7 @@ import ch.comgr.particleswarm.util.ObjectLoader;
 import ch.comgr.particleswarm.util.Tuple;
 import ch.comgr.particleswarm.util.UpdateEventArgs;
 import ch.fhnw.ether.scene.mesh.IMesh;
+import ch.fhnw.util.color.RGBA;
 import ch.fhnw.util.math.Mat4;
 import ch.fhnw.util.math.Vec3;
 
@@ -21,6 +22,7 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
     private List<IMesh> meshes = new ArrayList<>();
 
     float size = 1f;
+    float neighbourRadius = 5f;
     Vec3 sizeVec3 = new Vec3(size,size,size);
 
     public Particle(Vec3 startPos, String name, SwarmSimulation swarmSimulation) {
@@ -43,6 +45,12 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
         IMesh mesh = EtherGLUtil.createSphere(size);
         mesh.setName(name);
         meshes.add(mesh);
+
+        //add neighbour radius
+        //TODO: fix with nice solution
+        IMesh neighbourMesh = EtherGLUtil.createSphere(neighbourRadius, new RGBA(0.875f, 0.353f, 0.286f, 0.1f));
+        neighbourMesh.setName("neighbourMesh");
+        meshes.add(neighbourMesh);
 
         // get swarm object bounding box
         Tuple<IMesh, List<Vec3>> tuple = EtherGLUtil.createSphereBox(sizeVec3);
@@ -76,7 +84,11 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
         */
 
         meshes.forEach((mesh) -> {
-            mesh.setTransform(calcTransformation(pos, velocity));
+            //TODO: fix with nice solution
+            if(mesh.getName().equals("neighbourMesh"))
+                mesh.setTransform(Mat4.multiply(calcTransformation(pos, velocity), Mat4.scale(neighbourRadius)));
+            else
+                mesh.setTransform(calcTransformation(pos, velocity));
         });
     }
 
@@ -131,6 +143,8 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
     @Override
     public void update(UpdateEventArgs args) {
         super.nextStep(args);
+
+        this.neighbourRadius = args.getNeighbourRadius();
 
         /*
         // crashes visualVM

@@ -1,5 +1,6 @@
 package ch.comgr.particleswarm.model;
 
+import ch.comgr.particleswarm.controller.SwarmSimulation;
 import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.comgr.particleswarm.util.Tuple;
 import ch.comgr.particleswarm.util.UpdateEventArgs;
@@ -9,19 +10,19 @@ import ch.fhnw.util.math.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by Roger on 06.12.2015.
  */
-public class CollisionObject extends BaseSwarmObject implements ISimulationObject{
+public class CollisionObject extends BaseObject implements ISimulationObject{
 
     private List<IMesh> meshes = new ArrayList<>();
-    List<Vec3> vertexes = new ArrayList<>();
 
     Vec3 size = new Vec3(10, 20, 10);
 
-    public CollisionObject(Vec3 startPos, String name) {
-        super(startPos);
+    public CollisionObject(Vec3 startPos, String name, SwarmSimulation swarmSimulation) {
+        super(startPos, swarmSimulation);
 
         Tuple<IMesh, List<Vec3>> tuple = EtherGLUtil.createFilledBox(size);
 
@@ -30,22 +31,38 @@ public class CollisionObject extends BaseSwarmObject implements ISimulationObjec
         mesh.setName(name);
         meshes.add(mesh);
 
-        // creat bounding box
-        IMesh boundingBox = EtherGLUtil.createBox(size).getFirst();
-        boundingBox.setName("BoundingBox");
-        meshes.add(boundingBox);
-
         //init BaseSwarmObject
         setName(name);
-        setPosition(startPos, new Vec3(0, 0, 0));
+        changePosition(startPos);
         // set bounding box
         setVertices(tuple.getSecond());
     }
 
-    private void setPosition(Vec3 pos, Vec3 velocity) {
+    private void changePosition(Vec3 pos) {
         meshes.forEach((mesh) -> {
             mesh.setTransform(Mat4.translate(pos));
         });
+    }
+
+    private void setOrRemoveBoundingBoxMesh(boolean debugMode) {
+        // create bounding box
+        IMesh boundingBox = meshes.get(meshes.size() - 1);
+
+        if(debugMode) {
+            if(!"BoundingBox".equals(boundingBox.getName()))  {
+                boundingBox = EtherGLUtil.createBox(size).getFirst();
+                boundingBox.setName("BoundingBox");
+                meshes.add(boundingBox);
+
+                getSwarmSimulation().addMesh(boundingBox);
+
+                changePosition(getPosition());
+            }
+        } else {
+            if("BoundingBox".equals(boundingBox.getName())) {
+                meshes.remove(boundingBox);
+            }
+        }
     }
 
     @Override
@@ -55,10 +72,8 @@ public class CollisionObject extends BaseSwarmObject implements ISimulationObjec
 
     @Override
     public void update(UpdateEventArgs args) {
-        super.nextStep(args);
+        setOrRemoveBoundingBoxMesh(args.getDebugMode());
 
         updateBoundingBox();
-
-        setPosition(position, new Vec3(0, 0, 0));
     }
 }

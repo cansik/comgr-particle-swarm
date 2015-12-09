@@ -1,5 +1,6 @@
 package ch.comgr.particleswarm.model;
 
+import ch.comgr.particleswarm.controller.SwarmSimulation;
 import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.comgr.particleswarm.util.Tuple;
 import ch.comgr.particleswarm.util.UpdateEventArgs;
@@ -16,51 +17,28 @@ import static ch.comgr.particleswarm.util.EtherGLUtil.equalVec3;
 /**
  * Created by cansik on 24/10/15.
  */
-public abstract class BaseSwarmObject implements I3DObject {
+public abstract class BaseSwarmObject extends BaseObject {
 
     private UpdateEventArgs args;
 
     float angle;
-    Vec3 position;
     Vec3 velocity;
-    String name;
 
     private List<BaseSwarmObject> swarm;
     private List<Tuple<BaseSwarmObject, Float>> neighbours;
-    private List<Vec3> vertices;
-
-    private BoundingBox boundingBox;
 
     /**
      * Creates a new Swarm Object which try's to align to other objects.
      */
-    public BaseSwarmObject(Vec3 startPosition) {
+    public BaseSwarmObject(Vec3 startPosition, SwarmSimulation swarmSimulation) {
+        super(startPosition, swarmSimulation);
+
         //get random spawn angle
         angle = (float) (Math.random() * EtherGLUtil.TWO_PI);
-
-        //start from position zero
-        position = startPosition;
 
         //set velocity to initial amount
         velocity = EtherGLUtil.randomVec3();
     }
-
-
-    public void updateBoundingBox() {
-        boundingBox = new BoundingBox();
-        //initBoundingBox
-        for(Vec3 vec : vertices) {
-            boundingBox.add(position.x + vec.x, position.y + vec.y, position.z + vec.z);
-        }
-    }
-
-    public void setVertices(List<Vec3> vertices) {
-        assert vertices != null;
-        this.vertices = vertices;
-
-        updateBoundingBox();
-    }
-
 
     /**
      * Performs next step for this Swarm Object and updates position and velocity.
@@ -88,7 +66,7 @@ public abstract class BaseSwarmObject implements I3DObject {
         velocity = velocity.add(acceleration);
         velocity = EtherGLUtil.limit(velocity, args.getMaxSpeed());
 
-        position = position.add(velocity);
+        setPosition(getPosition().add(velocity));
         checkBorders();
     }
 
@@ -122,6 +100,7 @@ public abstract class BaseSwarmObject implements I3DObject {
         //rand_abstand
         float r = 2f;
 
+        Vec3 position = getPosition();
         float x = position.x;
         float y = position.y;
         float z = position.z;
@@ -149,6 +128,7 @@ public abstract class BaseSwarmObject implements I3DObject {
         //rand_abstand
         float r = 0f;
 
+        Vec3 position = getPosition();
         float x = position.x;
         float y = position.y;
         float z = position.z;
@@ -161,7 +141,7 @@ public abstract class BaseSwarmObject implements I3DObject {
         if (y > args.getBoxHeight() + r) y = -r;
         if (z > args.getBoxDepth() + r) z = -r;
 
-        position = new Vec3(x, y, z);
+        setPosition(new Vec3(x, y, z));
     }
 
     /**
@@ -183,7 +163,7 @@ public abstract class BaseSwarmObject implements I3DObject {
      * @return Force to target location
      */
     Vec3 getSteerToTargetForce(Vec3 target) {
-        Vec3 desired = target.subtract(position);
+        Vec3 desired = target.subtract(getPosition());
 
         desired = desired.normalize();
         desired = desired.scale(args.getMaxSpeed());
@@ -211,7 +191,7 @@ public abstract class BaseSwarmObject implements I3DObject {
             if (n.getSecond() > args.getDesiredSeparation())
                 continue;
 
-            Vec3 diff = position.subtract(n.getFirst().position);
+            Vec3 diff = getPosition().subtract(n.getFirst().getPosition());
 
             diff = diff.normalize();
             //weight by distance
@@ -271,7 +251,7 @@ public abstract class BaseSwarmObject implements I3DObject {
             return direction;
 
         for (Tuple<BaseSwarmObject, Float> n : neighbours)
-            direction = direction.add(n.getFirst().position);
+            direction = direction.add(n.getFirst().getPosition());
 
         direction = direction.scale(1.0f / neighbours.size());
         return getSteerToTargetForce(direction);
@@ -299,6 +279,10 @@ public abstract class BaseSwarmObject implements I3DObject {
         return n;
     }
 
+    public Vec3 getPosition() {
+        return super.getPosition();
+    }
+
     /**
      * Returns the distance to the other BaseSwarmObject
      *
@@ -306,7 +290,7 @@ public abstract class BaseSwarmObject implements I3DObject {
      * @return Distnace to the other BaseSwarmObject
      */
     public float getDistanceTo(BaseSwarmObject bso) {
-        return Math.abs(position.distance(bso.position));
+        return Math.abs(getPosition().distance(bso.getPosition()));
     }
 
     @Override
@@ -316,43 +300,11 @@ public abstract class BaseSwarmObject implements I3DObject {
 
         BaseSwarmObject bso = (BaseSwarmObject) obj;
 
-        boolean res = bso.position.equals(this.position) && bso.velocity.equals(this.velocity);
-        boolean res2 = equalVec3(bso.position, position) && equalVec3(bso.velocity, velocity);
+        boolean res = bso.getPosition().equals(getPosition()) && bso.velocity.equals(this.velocity);
+        boolean res2 = equalVec3(bso.getPosition(), getPosition()) && equalVec3(bso.velocity, velocity);
 
         assert res == res2;
 
         return res2;
-    }
-
-    @Override
-    public BoundingBox getBounds() {
-        assert boundingBox != null;
-
-        return boundingBox;
-    }
-
-    @Override
-    public Vec3 getPosition() {
-        return position;
-    }
-
-    @Override
-    public void setPosition(Vec3 vec3) {
-        this.position = vec3;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String s) {
-        this.name = s;
-    }
-
-    @Override
-    public UpdateRequest getUpdater() {
-        return null;
     }
 }

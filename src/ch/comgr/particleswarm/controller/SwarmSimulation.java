@@ -29,6 +29,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Logger;
 
 /**
  * Created by cansik on 20/10/15.
@@ -73,6 +74,7 @@ public class SwarmSimulation extends JFrame {
     private float numberOfObjects = (int) initialNumberOfObjects;
 
     private boolean showController = true;
+    private boolean debugMode = false;
 
     /***************
      * Parameter Variables
@@ -165,6 +167,9 @@ public class SwarmSimulation extends JFrame {
             // Add object button
             controller.getUI().addWidget(new SwarmButton(1, 0, "New", "", KeyEvent.VK_N, (button, v) -> addNewCollisionObject()));
 
+            // Add object button
+            controller.getUI().addWidget(new SwarmButton(2, 0, "Debug", "", KeyEvent.VK_D, (button, v) -> changeDebugMode()));
+
             // Add information collector
             informationCollectorWidget = new InformationCollectorWidget(5, controller.getUI().getHeight() - 180, "Information", "");
             controller.getUI().addWidget(informationCollectorWidget);
@@ -241,6 +246,7 @@ public class SwarmSimulation extends JFrame {
                 boxWidth,
                 boxHeight,
                 boxDepth,
+                debugMode,
                 new ArrayList<>(simulationObjects),
                 new ArrayList<>(collisionObjects));
 
@@ -261,12 +267,36 @@ public class SwarmSimulation extends JFrame {
         Vec3 distr = EtherGLUtil.randomVec3().scale(40f);
         Vec3 startVec = new Vec3(50, 50, 50);
 
-        CollisionObject object = new CollisionObject(distr.add(startVec), "Collision object");
+        CollisionObject object = new CollisionObject(distr.add(startVec), "Collision object", this);
         collisionObjects.add(object);
+        simulationObjects.add(object);
 
         for (IMesh m : object.getMeshes()) {
             scene.add3DObject(m);
             numberOfMeshes++;
+        }
+        numberOfObjects++;
+    }
+
+    private void changeDebugMode() {
+        debugMode = !debugMode;
+
+        if(!debugMode) {
+            removeBoundingBoxMeshs();
+        }
+    }
+
+    public void addMesh(IMesh m) {
+        scene.add3DObject(m);
+        numberOfMeshes++;
+    }
+
+    private void removeBoundingBoxMeshs() {
+        for(IMesh m : scene.getMeshes()) {
+            if("BoundingBox".equals(m.getName())) {
+                scene.remove3DObject(m);
+                numberOfMeshes--;
+            }
         }
     }
 
@@ -274,7 +304,7 @@ public class SwarmSimulation extends JFrame {
         Vec3 distr = EtherGLUtil.randomVec3().scale(5f);
         Vec3 startVec = new Vec3(50, 50, 50);
 
-        Particle particle = new Particle(distr.add(startVec), "Gen (" + (int) name + ")");
+        Particle particle = new Particle(distr.add(startVec), "Gen (" + (int) name + ")", this);
         simulationObjects.add(particle);
 
         for (IMesh m : particle.getMeshes()) {

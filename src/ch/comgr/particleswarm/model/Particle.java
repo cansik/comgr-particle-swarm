@@ -1,5 +1,6 @@
 package ch.comgr.particleswarm.model;
 
+import ch.comgr.particleswarm.controller.SwarmSimulation;
 import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.comgr.particleswarm.util.ObjectLoader;
 import ch.comgr.particleswarm.util.Tuple;
@@ -18,13 +19,12 @@ import java.util.logging.Logger;
 public class Particle extends BaseSwarmObject implements ISimulationObject {
 
     private List<IMesh> meshes = new ArrayList<>();
-    List<Vec3> vertexes = new ArrayList<>();
 
     float size = 1f;
     Vec3 sizeVec3 = new Vec3(size,size,size);
 
-    public Particle(Vec3 startPos, String name) {
-        super(startPos);
+    public Particle(Vec3 startPos, String name, SwarmSimulation swarmSimulation) {
+        super(startPos, swarmSimulation);
 
         //cube mash
         //meshes.add(MeshLibrary.createCube());
@@ -47,14 +47,9 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
         // get swarm object bounding box
         Tuple<IMesh, List<Vec3>> tuple = EtherGLUtil.createSphereBox(sizeVec3);
 
-        // add mesh
-        mesh = tuple.getFirst();
-        mesh.setName("BoundingBox");
-        meshes.add(mesh);
-
         //init BaseSwarmObject
         setName(name);
-        setPosition(startPos, velocity);
+        changePosition(startPos, velocity);
         // set bounding box
         setVertices(tuple.getSecond());
     }
@@ -74,19 +69,14 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
      *
      * @param pos Target position
      */
-    private void setPosition(Vec3 pos, Vec3 velocity) {
+    private void changePosition(Vec3 pos, Vec3 velocity) {
         /*
         Mat4 transform = Mat4.multiply(Mat4.translate(pos),
                 Mat4.lookAt(position, position.add(velocity), new Vec3(0, 0, 1)));
         */
 
         meshes.forEach((mesh) -> {
-            if(mesh.getName().equals("BoundingBox")) {
-                //TODO
-                mesh.setTransform(calcTransformation(pos, velocity));
-            } else {
-                mesh.setTransform(calcTransformation(pos, velocity));
-            }
+            mesh.setTransform(calcTransformation(pos, velocity));
         });
     }
 
@@ -113,6 +103,26 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
         }
     }
 
+    private void setOrRemoveBoundingBoxMesh(boolean debugMode) {
+        // create bounding box
+        IMesh boundingBox = meshes.get(meshes.size() - 1);
+
+        if(debugMode) {
+            if(!"BoundingBox".equals(boundingBox.getName()))  {
+                // add mesh
+                boundingBox = EtherGLUtil.createSphereBox(sizeVec3).getFirst();
+                boundingBox.setName("BoundingBox");
+                meshes.add(boundingBox);
+
+                getSwarmSimulation().addMesh(boundingBox);
+            }
+        } else {
+            if("BoundingBox".equals(boundingBox.getName())) {
+                meshes.remove(boundingBox);
+            }
+        }
+    }
+
     @Override
     public List<IMesh> getMeshes() {
         return meshes;
@@ -130,11 +140,12 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
             if (sim instanceof BaseSwarmObject)
                 swarm.add((BaseSwarmObject) sim);
         */
+        setOrRemoveBoundingBoxMesh(args.getDebugMode());
 
         updateBoundingBox();
 
         checkCollision(args.getCollisionObjects());
 
-        setPosition(position, velocity);
+        changePosition(getPosition(), velocity);
     }
 }

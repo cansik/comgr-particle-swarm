@@ -26,6 +26,8 @@ public class UpdateEventArgs {
     private final List<ISimulationObject> simulationObjects;
     private final List<CollisionObject> collisionObjects;
 
+    private final boolean debugMode;
+
     public UpdateEventArgs(float maxSpeed,
                            float maxForce,
                            float separationWeight,
@@ -36,6 +38,7 @@ public class UpdateEventArgs {
                            float boxWidth,
                            float boxHeight,
                            float boxDepth,
+                           boolean debugMode,
                            List<ISimulationObject> simulationObjects,
                            List<CollisionObject> collisionObjects)
     {
@@ -51,6 +54,7 @@ public class UpdateEventArgs {
         this.boxDepth = boxDepth;
         this.simulationObjects = simulationObjects;
         this.collisionObjects = collisionObjects;
+        this.debugMode = debugMode;
     }
 
     public float getMaxSpeed() {
@@ -99,5 +103,9 @@ public class UpdateEventArgs {
 
     public List<CollisionObject> getCollisionObjects() {
         return collisionObjects;
+    }
+
+    public boolean getDebugMode() {
+        return debugMode;
     }
 }

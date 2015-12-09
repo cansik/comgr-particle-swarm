@@ -162,25 +162,25 @@ public class SwarmSimulation extends JFrame {
             scene.add3DObject(camera);
             controller.setCamera(simulationView, camera);
 
-            // Add exit button
-            controller.getUI().addWidget(new SwarmButton(0, 0, "Quit", "", KeyEvent.VK_ESCAPE, (button, v) -> System.exit(0)));
-
-            // Add object button
-            controller.getUI().addWidget(new SwarmButton(1, 0, "New", "", KeyEvent.VK_N, (button, v) -> addNewCollisionObject()));
-
-            // Add object button
-            controller.getUI().addWidget(new SwarmButton(2, 0, "Debug", "", KeyEvent.VK_D, (button, v) -> changeDebugMode()));
-
-            // Add information collector
-            informationCollectorWidget = new InformationCollectorWidget(5, controller.getUI().getHeight() - 180, "Information", "");
-            controller.getUI().addWidget(informationCollectorWidget);
-
             //ui colors
             Color yellow = new Color(0xEFC94C);
             Color orange = new Color(0xE27A3F);
             Color red = new Color(0xDF5A49);
             Color green = new Color(0x45B29D);
             Color blue = new Color(0x334D5C);
+
+            // Add exit button
+            controller.getUI().addWidget(new SwarmButton(0, 0, "Quit", "", KeyEvent.VK_ESCAPE, false, blue, (button, v) -> System.exit(0)));
+
+            // Add object button
+            controller.getUI().addWidget(new SwarmButton(1, 0, "New", "", KeyEvent.VK_N, false, blue, (button, v) -> addNewCollisionObject()));
+
+            // Add object button
+            controller.getUI().addWidget(new SwarmButton(2, 0, "Debug", "", KeyEvent.VK_D, false, blue, (button, v) -> changeDebugMode()));
+
+            // Add information collector
+            informationCollectorWidget = new InformationCollectorWidget(5, controller.getUI().getHeight() - 180, "Information", "");
+            controller.getUI().addWidget(informationCollectorWidget);
 
             // add Slider
             SwarmSlider slider = new SwarmSlider(0, 1, "Objects", "", numberOfObjects, 0f, maxNumberOfObjects, green, (s, view) -> newNumberOfObjects = (int)s.getValue());

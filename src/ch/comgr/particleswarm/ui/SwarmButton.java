@@ -5,6 +5,8 @@ import ch.fhnw.ether.ui.Button;
 import ch.fhnw.ether.ui.GraphicsPlane;
 import ch.fhnw.ether.ui.UI;
 
+import java.awt.*;
+
 /**
  * Created by cansik on 05/11/15.
  */
@@ -14,6 +16,9 @@ public class SwarmButton extends Button {
     private static final int BUTTON_HEIGHT = 24;
 
     private static final int BUTTON_GAP = 8;
+
+    private Color backgroundColor = new Color(0.6f, 0, 0, 0.75f);
+    private Color pressedBackgroundColor = new Color(1, 0.2f, 0.2f, 0.75f);
 
     public SwarmButton(int x, int y, String label, String help, int key) {
         super(x, y, label, help, key, null);
@@ -31,6 +36,12 @@ public class SwarmButton extends Button {
     public SwarmButton(int x, int y, String label, String help, int key, boolean pressed, IButtonAction action) {
         super(x, y, label, help, key, action);
         setState(pressed);
+    }
+
+    public SwarmButton(int x, int y, String label, String help, int key, boolean pressed, Color backgroundColor, IButtonAction action) {
+        this(x, y, label, help, key, pressed, action);
+        this.backgroundColor =backgroundColor;
+        this.pressedBackgroundColor =backgroundColor.brighter();
     }
 
     @Override
@@ -69,7 +80,10 @@ public class SwarmButton extends Button {
         int bg = SwarmButton.BUTTON_GAP;
         int bx = getX() * (bg + bw);
         int by = getY() * (bg + bh);
-        surface.fillRect(getState().getColor(), bx + 4, surface.getHeight() - by - bh - 4, bw, bh);
+
+        Color c = getState() == State.DEFAULT ? backgroundColor : pressedBackgroundColor;
+
+        surface.fillRect(c, bx + 4, surface.getHeight() - by - bh - 4, bw, bh);
         String label = getLabel();
         if (label != null)
             surface.drawString(TEXT_COLOR, label, bx + 6, surface.getHeight() - by - 8);

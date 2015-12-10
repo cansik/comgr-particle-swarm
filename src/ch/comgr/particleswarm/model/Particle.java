@@ -46,12 +46,6 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
         mesh.setName(name);
         meshes.add(mesh);
 
-        //add neighbour radius
-        //TODO: fix with nice solution
-        IMesh neighbourMesh = EtherGLUtil.createSphere(neighbourRadius, new RGBA(0.875f, 0.353f, 0.286f, 0.1f));
-        neighbourMesh.setName("neighbourMesh");
-        meshes.add(neighbourMesh);
-
         // get swarm object bounding box
         Tuple<IMesh, List<Vec3>> tuple = EtherGLUtil.createSphereBox(sizeVec3);
 
@@ -85,7 +79,7 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
 
         meshes.forEach((mesh) -> {
             //TODO: fix with nice solution
-            if(mesh.getName().equals("neighbourMesh"))
+            if(mesh.getName().equals("BoundingBox"))
                 mesh.setTransform(Mat4.multiply(calcTransformation(pos, velocity), Mat4.scale(neighbourRadius)));
             else
                 mesh.setTransform(calcTransformation(pos, velocity));
@@ -126,6 +120,14 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
                 boundingBox.setName("BoundingBox");
                 meshes.add(boundingBox);
 
+                /*
+                //add neighbour radius
+                //TODO: fix with nice solution
+                IMesh neighbourMesh = EtherGLUtil.createSphere(neighbourRadius, new RGBA(0.875f, 0.353f, 0.286f, 0.1f));
+                neighbourMesh.setName("neighbourMesh");
+                meshes.add(neighbourMesh);
+                */
+
                 getSwarmSimulation().addMesh(boundingBox);
             }
         } else {
@@ -161,5 +163,14 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
         checkCollision(args.getCollisionObjects());
 
         changePosition(getPosition(), velocity);
+    }
+
+    public IMesh getMeshByName(String name)
+    {
+        for(IMesh m : meshes)
+            if (m.getName().equals(name))
+                return m;
+
+        return null;
     }
 }

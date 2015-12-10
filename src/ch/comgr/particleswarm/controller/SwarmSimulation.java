@@ -187,11 +187,11 @@ public class SwarmSimulation extends JFrame {
             controller.getUI().addWidget(slider);
 
             // desired separation
-            SwarmSlider desiredSeparationSlider = new SwarmSlider(0, 2, "Des-Separation", "", desiredSeparation, 0f, 20f, red, (s, view) -> desiredSeparation = s.getValue());
+            SwarmSlider desiredSeparationSlider = new SwarmSlider(0, 2, "Des-Separation", "", desiredSeparation, 0f, 30f, red, (s, view) -> desiredSeparation = s.getValue());
             controller.getUI().addWidget(desiredSeparationSlider);
 
             // desired neighbour radius
-            SwarmSlider neighbourRadiusSlider = new SwarmSlider(0, 3, "Neighbour Radius", "", neighbourRadius, 0f, 25f, red, (s, view) -> neighbourRadius = s.getValue());
+            SwarmSlider neighbourRadiusSlider = new SwarmSlider(0, 3, "Neighbour Radius", "", neighbourRadius, 0f, 30f, red, (s, view) -> neighbourRadius = s.getValue());
             controller.getUI().addWidget(neighbourRadiusSlider);
 
             // separation

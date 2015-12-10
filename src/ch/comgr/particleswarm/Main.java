@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] args) {
         UIControlCenter control =  new UIControlCenter();
         AddingSampleParameterChangedListener(control);
-        control.createAndShow();
+        //control.createAndShow();
 
         SwarmSimulation simulation = new SwarmSimulation();
         simulation.run();

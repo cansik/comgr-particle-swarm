@@ -65,27 +65,27 @@ public class SwarmSimulationController extends DefaultController {
         getUI().addWidget(informationCollectorWidget);
 
         int xIndex = 0;
-        AddHorizontalButtonOnBottom(this, "Quit", KeyEvent.VK_ESCAPE, Color.BLUE, xIndex++, (button, v) -> System.exit(0));
-        AddHorizontalButtonOnBottom(this, "New", KeyEvent.VK_N, Color.BLUE, xIndex++, (button, v) -> swarmSimulation.addNewCollisionObject());
-        AddHorizontalButtonOnBottom(this, "New", KeyEvent.VK_D, Color.BLUE, xIndex++, (button, v) -> swarmSimulation.changeDebugMode());
+        addHorizontalButtonOnBottom(this, "Quit", KeyEvent.VK_ESCAPE, Color.BLUE, xIndex++, (button, v) -> System.exit(0));
+        addHorizontalButtonOnBottom(this, "New", KeyEvent.VK_N, Color.BLUE, xIndex++, (button, v) -> swarmSimulation.addNewCollisionObject());
+        addHorizontalButtonOnBottom(this, "New", KeyEvent.VK_D, Color.BLUE, xIndex++, (button, v) -> swarmSimulation.changeDebugMode());
 
         int yIndex = 1;
-        AddSliderVertical(this, configuration.NewNumberOfObjects, yIndex++);
-        AddSliderVertical(this, configuration.DesSeparation, yIndex++);
-        AddSliderVertical(this, configuration.NeighbourRadius, yIndex++);
-        AddSliderVertical(this, configuration.Separation, yIndex++);
-        AddSliderVertical(this, configuration.Alignment, yIndex++);
-        AddSliderVertical(this, configuration.Cohesion, yIndex++);
-        AddSliderVertical(this, configuration.MaxSpeed, yIndex++);
-        AddSliderVertical(this, configuration.MaxForce, yIndex++);
+        addSliderVertical(this, configuration.NewNumberOfObjects, yIndex++);
+        addSliderVertical(this, configuration.DesSeparation, yIndex++);
+        addSliderVertical(this, configuration.NeighbourRadius, yIndex++);
+        addSliderVertical(this, configuration.Separation, yIndex++);
+        addSliderVertical(this, configuration.Alignment, yIndex++);
+        addSliderVertical(this, configuration.Cohesion, yIndex++);
+        addSliderVertical(this, configuration.MaxSpeed, yIndex++);
+        addSliderVertical(this, configuration.MaxForce, yIndex++);
     }
 
-    private void AddHorizontalButtonOnBottom(IController controller, String name, int keyEventId, Color color, int xIndex, ch.fhnw.ether.ui.Button.IButtonAction buttonAction){
+    private void addHorizontalButtonOnBottom(IController controller, String name, int keyEventId, Color color, int xIndex, ch.fhnw.ether.ui.Button.IButtonAction buttonAction){
         SwarmButton btn = new SwarmButton(xIndex, 0, name, "", keyEventId, false, color, buttonAction);
         controller.getUI().addWidget(btn);
     }
 
-    private void AddSliderVertical(IController controller, SwarmConfiguration.FloatProperty property, int yIndex){
+    private void addSliderVertical(IController controller, SwarmConfiguration.FloatProperty property, int yIndex){
         SwarmSlider slider = new SwarmSlider(
                 0, //yIndex
                 yIndex,

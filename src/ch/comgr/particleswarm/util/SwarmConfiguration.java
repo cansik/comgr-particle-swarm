@@ -28,14 +28,14 @@ public class SwarmConfiguration
         public float getMaxValue() {return maxValue;}
     }
 
-    public final FloatProperty NewNumerOfObjects = new FloatProperty("NewNumerOfObjects", Color.green, 15, 1000);
-    public final FloatProperty NeighbourRadius = new FloatProperty("Neighbour Radius", Color.red, 15.0f, 30f);
+    public final FloatProperty NewNumberOfObjects = new FloatProperty("Objects", Color.green, 15, 1000);
+    public final FloatProperty NeighbourRadius = new FloatProperty("Radius", Color.red, 15.0f, 30f);
     public final FloatProperty Separation = new FloatProperty("Separation", Color.orange, 1.5f, 5f);
     public final FloatProperty Alignment = new FloatProperty("Alignment", Color.orange, 1.0f, 5f);
     public final FloatProperty Cohesion = new FloatProperty("Cohesion", Color.orange, 1.0f, 5f);
     public final FloatProperty MaxSpeed = new FloatProperty("MaxSpeed", Color.yellow, 0.5f, 2f);
     public final FloatProperty MaxForce = new FloatProperty("MaxForce", Color.yellow, 0.03f, 2f);
-    public final FloatProperty DesSeparation = new FloatProperty("Des-Separation", Color.red, 5.0f, 30f);
+    public final FloatProperty DesSeparation = new FloatProperty("Des. Separation", Color.red, 5.0f, 30f);
     public final FloatProperty BoxWidth = new FloatProperty("BoxWidth", 100f);
     public final FloatProperty BoxHeight = new FloatProperty("BoxHeight", 100f);
     public final FloatProperty BoxDepth = new FloatProperty("BoxDepth", 100f);

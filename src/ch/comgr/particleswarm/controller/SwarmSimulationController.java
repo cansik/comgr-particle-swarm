@@ -40,7 +40,6 @@ public class SwarmSimulationController extends DefaultController {
     public void initView()
     {
         setupViewAndCamera();
-        informationCollectorWidget = new InformationCollectorWidget(5, getUI().getHeight() - 180, "Information", "");
         setupUi();
     }
 
@@ -62,6 +61,7 @@ public class SwarmSimulationController extends DefaultController {
 
     private void setupUi()
     {
+        informationCollectorWidget = new InformationCollectorWidget(5, getUI().getHeight() - 180, "Information", "");
         getUI().addWidget(informationCollectorWidget);
 
         int xIndex = 0;
@@ -70,7 +70,7 @@ public class SwarmSimulationController extends DefaultController {
         AddHorizontalButtonOnBottom(this, "New", KeyEvent.VK_D, Color.BLUE, xIndex++, (button, v) -> swarmSimulation.changeDebugMode());
 
         int yIndex = 1;
-        AddSliderVertical(this, configuration.NewNumerOfObjects, yIndex++);
+        AddSliderVertical(this, configuration.NewNumberOfObjects, yIndex++);
         AddSliderVertical(this, configuration.DesSeparation, yIndex++);
         AddSliderVertical(this, configuration.NeighbourRadius, yIndex++);
         AddSliderVertical(this, configuration.Separation, yIndex++);

@@ -8,6 +8,8 @@ import ch.fhnw.ether.scene.mesh.IMesh;
 import ch.fhnw.util.math.Vec3;
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -22,12 +24,13 @@ public class SwarmSimulation extends JFrame {
     private CopyOnWriteArrayList<CollisionObject> collisionObjects;
 
     public SwarmSimulation() {
-        swarmStatistics.NumOfObjects = (int) swarmConfiguration.NewNumerOfObjects.getCurrentValue();
+        swarmStatistics.NumOfObjects = (int) swarmConfiguration.NewNumberOfObjects.getCurrentValue();
         simulationObjects = new CopyOnWriteArrayList<>();
         collisionObjects = new CopyOnWriteArrayList<>();
 
         controller = new SwarmSimulationController(this, swarmConfiguration);
         controller.run((time) -> {
+            // this code will run in another thread (UI Thread ?)
             controller.initView();
             controller.repaint();
             createInitialSimulationObjects();
@@ -36,7 +39,7 @@ public class SwarmSimulation extends JFrame {
 
     private void createInitialSimulationObjects() {
         controller.getScene().add3DObject(EtherGLUtil.createBox(new Vec3(100, 100, 100)).getFirst());
-        for (int i = 0; i < swarmConfiguration.NewNumerOfObjects.getCurrentValue(); i++) {
+        for (int i = 0; i < swarmConfiguration.NewNumberOfObjects.getCurrentValue(); i++) {
             //start at 50, 50, 50
             addSimulationObject(i);
         }
@@ -63,7 +66,7 @@ public class SwarmSimulation extends JFrame {
     }
 
     private void addOrRemoveSimulationObjectsOnConfigChange() {
-        int change = (int) ( swarmConfiguration.NewNumerOfObjects.getCurrentValue() - swarmStatistics.NumOfObjects);
+        int change = (int) ( swarmConfiguration.NewNumberOfObjects.getCurrentValue() - swarmStatistics.NumOfObjects);
 
         if (change > 0) {
             for (int i = change; i > 0; i--) {

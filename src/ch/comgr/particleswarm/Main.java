@@ -6,9 +6,9 @@ import ch.comgr.particleswarm.gui.UIControlCenter;
 public class Main {
 
     public static void main(String[] args) {
-        UIControlCenter control =  new UIControlCenter();
-        AddingSampleParameterChangedListener(control);
-        //control.createAndShow();
+//        UIControlCenter control =  new UIControlCenter();
+//        AddingSampleParameterChangedListener(control);
+//        control.createAndShow();
 
         SwarmSimulation simulation = new SwarmSimulation();
         simulation.run();

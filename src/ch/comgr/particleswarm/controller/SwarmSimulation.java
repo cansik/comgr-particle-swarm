@@ -8,6 +8,7 @@ import ch.comgr.particleswarm.ui.SwarmButton;
 import ch.comgr.particleswarm.ui.SwarmSlider;
 import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.comgr.particleswarm.util.FPSCounter;
+import ch.comgr.particleswarm.util.SwarmConfiguration;
 import ch.comgr.particleswarm.util.UpdateEventArgs;
 import ch.fhnw.ether.controller.DefaultController;
 import ch.fhnw.ether.controller.IController;
@@ -16,9 +17,7 @@ import ch.fhnw.ether.scene.DefaultScene;
 import ch.fhnw.ether.scene.IScene;
 import ch.fhnw.ether.scene.camera.Camera;
 import ch.fhnw.ether.scene.mesh.IMesh;
-import ch.fhnw.ether.ui.GraphicsPlane;
-import ch.fhnw.ether.ui.ParameterWindow;
-import ch.fhnw.ether.ui.Slider;
+import ch.fhnw.ether.ui.Button;
 import ch.fhnw.ether.view.IView;
 import ch.fhnw.ether.view.gl.DefaultView;
 import ch.fhnw.util.math.Vec3;
@@ -26,16 +25,14 @@ import ch.fhnw.util.math.Vec3;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Logger;
 
 /**
  * Created by cansik on 20/10/15.
  */
 public class SwarmSimulation extends JFrame {
+    SwarmConfiguration swarmConfiguration = new SwarmConfiguration();
     /**************
      * Config-Variables
      ***************/
@@ -50,8 +47,6 @@ public class SwarmSimulation extends JFrame {
     private static final int screenPositionY = 40;
     private static final int screenWidth = 1024;
     private static final int screenHeight = 800;
-    private static final int maxNumberOfObjects = 1000;
-    private static final float initialNumberOfObjects = 15;
     // default camera location Vec3
     private static final Vec3 default_camera_location = new Vec3(200, 200, 100);
 
@@ -72,31 +67,9 @@ public class SwarmSimulation extends JFrame {
     private InformationCollectorWidget informationCollectorWidget;
 
     private int numberOfMeshes;
-    private float numberOfObjects = (int) initialNumberOfObjects;
+    private float numberOfObjects = (int) swarmConfiguration.NewNumerOfObjects.getCurrentValue();
 
     private boolean showController = true;
-    private boolean debugMode = false;
-
-    /***************
-     * Parameter Variables
-     ***************/
-
-    private volatile float newNumberOfObjects = (int) initialNumberOfObjects;
-
-    private volatile float maxSpeed = 0.5f;
-    private float maxForce = 0.03f;
-
-    private volatile float separationWeight = 1.5f;
-    private volatile float alignmentWeight = 1.0f;
-    private volatile float cohesionWeight = 1.0f;
-
-    private volatile float desiredSeparation = 5.0f;
-    private volatile float neighbourRadius = 15.0f;
-
-    private float boxWidth = 100f;
-    private float boxHeight = 100f;
-    private float boxDepth = 100f;
-
     /*****************************/
 
     public SwarmSimulation() {
@@ -162,57 +135,24 @@ public class SwarmSimulation extends JFrame {
             scene.add3DObject(camera);
             controller.setCamera(simulationView, camera);
 
-            //ui colors
-            Color yellow = new Color(0xEFC94C);
-            Color orange = new Color(0xE27A3F);
-            Color red = new Color(0xDF5A49);
-            Color green = new Color(0x45B29D);
-            Color blue = new Color(0x334D5C);
-
-            // Add exit button
-            controller.getUI().addWidget(new SwarmButton(0, 0, "Quit", "", KeyEvent.VK_ESCAPE, false, blue, (button, v) -> System.exit(0)));
-
-            // Add object button
-            controller.getUI().addWidget(new SwarmButton(1, 0, "New", "", KeyEvent.VK_N, false, blue, (button, v) -> addNewCollisionObject()));
-
-            // Add object button
-            controller.getUI().addWidget(new SwarmButton(2, 0, "Debug", "", KeyEvent.VK_D, false, blue, (button, v) -> changeDebugMode()));
+            int xIndex = 0;
+            AddHorizontalButtonOnBottom(controller, "Quit", KeyEvent.VK_ESCAPE, Color.BLUE, xIndex++, (button, v) -> System.exit(0));
+            AddHorizontalButtonOnBottom(controller, "New", KeyEvent.VK_N, Color.BLUE, xIndex++, (button, v) -> addNewCollisionObject());
+            AddHorizontalButtonOnBottom(controller, "New", KeyEvent.VK_D, Color.BLUE, xIndex++, (button, v) -> changeDebugMode());
 
             // Add information collector
             informationCollectorWidget = new InformationCollectorWidget(5, controller.getUI().getHeight() - 180, "Information", "");
             controller.getUI().addWidget(informationCollectorWidget);
 
-            // add Slider
-            SwarmSlider slider = new SwarmSlider(0, 1, "Objects", "", numberOfObjects, 0f, maxNumberOfObjects, green, (s, view) -> newNumberOfObjects = (int)s.getValue());
-            controller.getUI().addWidget(slider);
-
-            // desired separation
-            SwarmSlider desiredSeparationSlider = new SwarmSlider(0, 2, "Des-Separation", "", desiredSeparation, 0f, 30f, red, (s, view) -> desiredSeparation = s.getValue());
-            controller.getUI().addWidget(desiredSeparationSlider);
-
-            // desired neighbour radius
-            SwarmSlider neighbourRadiusSlider = new SwarmSlider(0, 3, "Neighbour Radius", "", neighbourRadius, 0f, 30f, red, (s, view) -> neighbourRadius = s.getValue());
-            controller.getUI().addWidget(neighbourRadiusSlider);
-
-            // separation
-            SwarmSlider separationSlider = new SwarmSlider(0, 4, "Separation", "", separationWeight, 0f, 5f, orange, (s, view) -> separationWeight = s.getValue());
-            controller.getUI().addWidget(separationSlider);
-
-            // alginment
-            SwarmSlider alignmentSlider = new SwarmSlider(0, 5, "Alignment", "", alignmentWeight, 0f, 5f, orange, (s, view) -> alignmentWeight = s.getValue());
-            controller.getUI().addWidget(alignmentSlider);
-
-            //cohesion
-            SwarmSlider cohesionSlider = new SwarmSlider(0, 6, "Cohesion", "", cohesionWeight, 0f, 5f, orange, (s, view) -> cohesionWeight = s.getValue());
-            controller.getUI().addWidget(cohesionSlider);
-
-            // max speed
-            SwarmSlider maxSpeedSlider = new SwarmSlider(0, 7, "Max Speed", "", maxSpeed, 0f, 2f, yellow, (s, view) -> maxSpeed = s.getValue());
-            controller.getUI().addWidget(maxSpeedSlider);
-
-            // max speed
-            SwarmSlider maxForceSlider = new SwarmSlider(0, 8, "Max Force", "", maxForce, 0f, 2f, yellow, (s, view) -> maxForce = s.getValue());
-            controller.getUI().addWidget(maxForceSlider);
+            int yIndex = 1;
+            AddSliderVertical(controller, swarmConfiguration.NewNumerOfObjects, yIndex++);
+            AddSliderVertical(controller, swarmConfiguration.DesSeparation, yIndex++);
+            AddSliderVertical(controller, swarmConfiguration.NeighbourRadius, yIndex++);
+            AddSliderVertical(controller, swarmConfiguration.Separation, yIndex++);
+            AddSliderVertical(controller, swarmConfiguration.Alignment, yIndex++);
+            AddSliderVertical(controller, swarmConfiguration.Cohesion, yIndex++);
+            AddSliderVertical(controller, swarmConfiguration.MaxSpeed, yIndex++);
+            AddSliderVertical(controller, swarmConfiguration.MaxForce, yIndex++);
 
             // count the camera system
             controller.repaint();
@@ -222,11 +162,31 @@ public class SwarmSimulation extends JFrame {
         });
     }
 
+    private void AddHorizontalButtonOnBottom(IController controller, String name, int keyEventId, Color color, int xIndex, Button.IButtonAction buttonAction){
+        SwarmButton btn = new SwarmButton(xIndex, 0, name, "", keyEventId, false, color, buttonAction);
+        controller.getUI().addWidget(btn);
+    }
+
+    private void AddSliderVertical(IController controller, SwarmConfiguration.FloatProperty property, int yIndex){
+        SwarmSlider slider = new SwarmSlider(
+                0,
+                yIndex,
+                property.Name,
+                "",
+                property.getCurrentValue(),
+                0f,
+                property.getMaxValue(),
+                property.Color,
+                (s, view) -> property.setCurrentValue(s.getValue()));
+
+        controller.getUI().addWidget(slider);
+    }
+
     public void initialiseScene() {
         scene.add3DObject(EtherGLUtil.createBox(new Vec3(100, 100, 100)).getFirst());
 
         //create initial scene
-        for (int i = 0; i < initialNumberOfObjects; i++) {
+        for (int i = 0; i < swarmConfiguration.NewNumerOfObjects.getCurrentValue(); i++) { //Todo: Check function. Was initialNumberOfObjects before
             //start at 50, 50, 50
             addSimulationObject(i);
         }
@@ -250,7 +210,7 @@ public class SwarmSimulation extends JFrame {
     }
 
     private void updateNumberOfObjects() {
-        int change = (int) (newNumberOfObjects - numberOfObjects);
+        int change = (int) ( swarmConfiguration.NewNumerOfObjects.getCurrentValue() - numberOfObjects);
 
         if (change > 0) {
             for (int i = change; i > 0; i--) {
@@ -268,18 +228,7 @@ public class SwarmSimulation extends JFrame {
      */
     private void update() {
         // create update event args
-        UpdateEventArgs args = new UpdateEventArgs(
-                maxSpeed,
-                maxForce,
-                separationWeight,
-                alignmentWeight,
-                cohesionWeight,
-                desiredSeparation,
-                neighbourRadius,
-                boxWidth,
-                boxHeight,
-                boxDepth,
-                debugMode,
+        UpdateEventArgs args = new UpdateEventArgs(swarmConfiguration,
                 new ArrayList<>(simulationObjects),
                 new ArrayList<>(collisionObjects));
 
@@ -312,9 +261,9 @@ public class SwarmSimulation extends JFrame {
     }
 
     private void changeDebugMode() {
-        debugMode = !debugMode;
+        swarmConfiguration.DebugMode = !swarmConfiguration.DebugMode;
 
-        if(!debugMode) {
+        if(!swarmConfiguration.DebugMode) {
             removeBoundingBoxMeshs();
         }
     }

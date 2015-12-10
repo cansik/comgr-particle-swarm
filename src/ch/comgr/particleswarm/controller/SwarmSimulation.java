@@ -10,9 +10,7 @@ import ch.comgr.particleswarm.util.EtherGLUtil;
 import ch.comgr.particleswarm.util.FPSCounter;
 import ch.comgr.particleswarm.util.SwarmConfiguration;
 import ch.comgr.particleswarm.util.UpdateEventArgs;
-import ch.fhnw.ether.controller.DefaultController;
 import ch.fhnw.ether.controller.IController;
-import ch.fhnw.ether.controller.event.IKeyEvent;
 import ch.fhnw.ether.scene.DefaultScene;
 import ch.fhnw.ether.scene.IScene;
 import ch.fhnw.ether.scene.camera.Camera;
@@ -33,32 +31,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class SwarmSimulation extends JFrame {
     SwarmConfiguration swarmConfiguration = new SwarmConfiguration();
-    /**************
-     * Config-Variables
-     ***************/
-
-    // simulation loop interval
-    private static final double LOOP_INTERVAL = 0.5; //1.0 / 60.0;
-    // camera location increments
-    private static final float INC_XY = 0.25f;
-    private static final float INC_Z = 0.25f;
-    // screen properties
-    private static final int screenPositionX = 10;
-    private static final int screenPositionY = 40;
-    private static final int screenWidth = 1024;
-    private static final int screenHeight = 800;
-    // default camera location Vec3
-    private static final Vec3 default_camera_location = new Vec3(200, 200, 100);
-
-    /**************
-     * Local Variables
-     ***************/
-
     private IController controller;
     private Camera camera;
-    private DefaultView simulationView;
     private IScene scene;
-    private IMesh box;
 
     private CopyOnWriteArrayList<ISimulationObject> simulationObjects;
     private CopyOnWriteArrayList<CollisionObject> collisionObjects;
@@ -69,63 +44,25 @@ public class SwarmSimulation extends JFrame {
     private int numberOfMeshes;
     private float numberOfObjects = (int) swarmConfiguration.NewNumerOfObjects.getCurrentValue();
 
-    private boolean showController = true;
-    /*****************************/
-
     public SwarmSimulation() {
         simulationObjects = new CopyOnWriteArrayList<>();
         collisionObjects = new CopyOnWriteArrayList<>();
 
         // Create controller
-        controller = new DefaultController() {
-            @Override
-            public void keyPressed(IKeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case IKeyEvent.VK_UP:
-                        camera.setPosition(camera.getPosition().add(Vec3.Y.scale(INC_XY)));
-                        break;
-                    case IKeyEvent.VK_DOWN:
-                        camera.setPosition(camera.getPosition().add(Vec3.Y_NEG.scale(INC_XY)));
-                        break;
-                    case IKeyEvent.VK_LEFT:
-                        camera.setPosition(camera.getPosition().add(Vec3.X_NEG.scale(INC_XY)));
-                        break;
-                    case IKeyEvent.VK_RIGHT:
-                        camera.setPosition(camera.getPosition().add(Vec3.X.scale(INC_XY)));
-                        break;
-                    case IKeyEvent.VK_Q:
-                        camera.setPosition(camera.getPosition().add(Vec3.Z.scale(INC_Z)));
-                        break;
-                    case IKeyEvent.VK_A:
-                        camera.setPosition(camera.getPosition().add(Vec3.Z_NEG.scale(INC_Z)));
-                        break;
-                    case IKeyEvent.VK_R:
-                        camera.setPosition(default_camera_location);
-                        break;
-                    case IKeyEvent.VK_B:
-                        if(showController) {
-                            controller.getUI().disable();
-                            showController = false;
-                        }
-                        else
-                        {
-                            controller.getUI().enable();
-                            showController = true;
-                        }
-                        break;
-                    default:
-                        super.keyPressed(e);
-                }
-            }
-        };
-
+        controller = new SwarmSimulationController(camera, swarmConfiguration);
         controller.run((time) -> {
             // Create view
             camera = new Camera();
-            camera.setPosition(default_camera_location);
+            camera.setPosition(swarmConfiguration.DefaultCameraLocation);
             camera.setUp(new Vec3(0, 0, 1));
 
-            simulationView = new DefaultView(controller, screenPositionX, screenPositionY, screenWidth, screenHeight, IView.INTERACTIVE_VIEW, "Swarm Simulation");
+            DefaultView simulationView = new DefaultView(controller,
+                    swarmConfiguration.ScreenPositionX,
+                    swarmConfiguration.ScreenPositionY,
+                    swarmConfiguration.ScreenWidth,
+                    swarmConfiguration.ScreenHeight,
+                    IView.INTERACTIVE_VIEW,
+                    "Swarm Simulation");
 
             // Create scene
             scene = new DefaultScene(controller);
@@ -156,9 +93,7 @@ public class SwarmSimulation extends JFrame {
 
             // count the camera system
             controller.repaint();
-
-            // initialise GameObjects
-            initialiseScene();
+            createInitialSimulationObjects();
         });
     }
 
@@ -169,24 +104,22 @@ public class SwarmSimulation extends JFrame {
 
     private void AddSliderVertical(IController controller, SwarmConfiguration.FloatProperty property, int yIndex){
         SwarmSlider slider = new SwarmSlider(
-                0,
+                0, //yIndex
                 yIndex,
                 property.Name,
-                "",
-                property.getCurrentValue(),
-                0f,
+                "", // Description
+                property.getCurrentValue(), // Value
+                0f, // MinValue
                 property.getMaxValue(),
                 property.Color,
-                (s, view) -> property.setCurrentValue(s.getValue()));
+                (s, view) -> property.setCurrentValue(s.getValue())); // Action
 
         controller.getUI().addWidget(slider);
     }
 
-    public void initialiseScene() {
+    private void createInitialSimulationObjects() {
         scene.add3DObject(EtherGLUtil.createBox(new Vec3(100, 100, 100)).getFirst());
-
-        //create initial scene
-        for (int i = 0; i < swarmConfiguration.NewNumerOfObjects.getCurrentValue(); i++) { //Todo: Check function. Was initialNumberOfObjects before
+        for (int i = 0; i < swarmConfiguration.NewNumerOfObjects.getCurrentValue(); i++) {
             //start at 50, 50, 50
             addSimulationObject(i);
         }
@@ -198,18 +131,13 @@ public class SwarmSimulation extends JFrame {
     public void run() {
         //main simulation loop
         controller.animate((time, interval) -> {
-            // update information collector
             updateInformationCollector();
-
-            // update slider and objects in the scene
-            updateNumberOfObjects();
-
-            // count simulation logic for each element
-            update();
+            addOrRemoveSimulationObjectsOnConfigChange();
+            updateSimulationObjects();
         });
     }
 
-    private void updateNumberOfObjects() {
+    private void addOrRemoveSimulationObjectsOnConfigChange() {
         int change = (int) ( swarmConfiguration.NewNumerOfObjects.getCurrentValue() - numberOfObjects);
 
         if (change > 0) {
@@ -226,8 +154,8 @@ public class SwarmSimulation extends JFrame {
     /**
      * Updates all simulation objects.
      */
-    private void update() {
-        // create update event args
+    private void updateSimulationObjects() {
+        // create updateSimulationObjects event args
         UpdateEventArgs args = new UpdateEventArgs(swarmConfiguration,
                 new ArrayList<>(simulationObjects),
                 new ArrayList<>(collisionObjects));

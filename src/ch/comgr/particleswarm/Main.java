@@ -14,10 +14,10 @@ public class Main {
         simulation.run();
     }
 
-    private static void AddingSampleParameterChangedListener(UIControlCenter c){
-        // Test
-        c.addParameterChangedListener(s -> {
-            System.out.println(s.name() + ": "+ c.getParameterInformation(s).Value);
-        });
-    }
+//    private static void AddingSampleParameterChangedListener(UIControlCenter c){
+//        // Test
+//        c.addParameterChangedListener(s -> {
+//            System.out.println(s.name() + ": "+ c.getParameterInformation(s).Value);
+//        });
+//    }
 }

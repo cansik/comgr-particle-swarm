@@ -1,5 +1,7 @@
 package ch.comgr.particleswarm.util;
 
+import ch.fhnw.util.math.Vec3;
+
 import java.awt.*;
 
 public class SwarmConfiguration
@@ -26,7 +28,6 @@ public class SwarmConfiguration
         public float getMaxValue() {return maxValue;}
     }
 
-
     public final FloatProperty NewNumerOfObjects = new FloatProperty("NewNumerOfObjects", Color.green, 15, 1000);
     public final FloatProperty NeighbourRadius = new FloatProperty("Neighbour Radius", Color.red, 15.0f, 30f);
     public final FloatProperty Separation = new FloatProperty("Separation", Color.orange, 1.5f, 5f);
@@ -41,4 +42,14 @@ public class SwarmConfiguration
 
     //TODO: RRA - Adding boolean Property (extracting FloatProperty-Class)
     public volatile boolean DebugMode = false;
+    public volatile boolean ShowController = true;
+
+    public final double LoopInterval = 0.5; // 1.0/60.0
+    public final float IncrementXy = 0.25f;
+    public final float IncrementZ = 0.25f;
+    public final int ScreenPositionX = 10;
+    public final int ScreenPositionY = 40;
+    public final int ScreenWidth = 1024;
+    public final int ScreenHeight = 800;
+    public final Vec3 DefaultCameraLocation = new Vec3(200, 200, 100);
 }

@@ -61,13 +61,13 @@ public abstract class BaseSwarmObject extends BaseObject {
 
         //calculate new acceleration
         Vec3 acceleration = calculateAcceleration();
+        checkBorders();
 
         //apply acceleration to velocity and count position
         velocity = velocity.add(acceleration);
         velocity = EtherGLUtil.limit(velocity, args.getMaxSpeed());
 
         setPosition(getPosition().add(velocity));
-        checkBorders();
     }
 
     /**
@@ -98,7 +98,7 @@ public abstract class BaseSwarmObject extends BaseObject {
 
     void checkBorders() {
         //rand_abstand
-        float r = 2f;
+        float r = 0f;
 
         Vec3 position = getPosition();
         float x = position.x;
@@ -110,13 +110,13 @@ public abstract class BaseSwarmObject extends BaseObject {
         float v3 = velocity.z;
 
         //lower
-        if (x < -r) v1 *= -1;
-        if (y < -r) v2 *= -1;
-        if (z < -r) v3 *= -1;
+        if (x < r) v1 *= -1;
+        if (y < r) v2 *= -1;
+        if (z < r) v3 *= -1;
 
-        if (x > args.getBoxWidth() + r) v1 *= -1;
-        if (y > args.getBoxHeight() + r) v2 *= -1;
-        if (z > args.getBoxDepth() + r) v3 *= -1;
+        if (x > args.getBoxWidth() - r) v1 *= -1;
+        if (y > args.getBoxHeight() - r) v2 *= -1;
+        if (z > args.getBoxDepth() - r) v3 *= -1;
 
         velocity = new Vec3(v1, v2, v3);
     }

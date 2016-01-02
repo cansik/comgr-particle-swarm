@@ -46,18 +46,13 @@ public abstract class BaseSwarmObject extends BaseObject {
      * @param args Simulation arguments.
      */
     public void nextStep(UpdateEventArgs args) {
-        //set arguments
         this.args = args;
+        swarm = args.getBaseSwarmObjects();
 
-        //get swarm
-        swarm = new ArrayList<>();
+        List<BaseSwarmObject> possibleNeighbours = args.getGridCoordination()
+                .getSwarmsInRadius(getPosition(), (int) args.getNeighbourRadius());
 
-        for (ISimulationObject sim : args.getSimulationObjects())
-            if (sim instanceof BaseSwarmObject)
-                swarm.add((BaseSwarmObject) sim);
-
-        //get neighbours
-        neighbours = getNeighbours(args.getNeighbourRadius());
+        neighbours = getNeighbours(possibleNeighbours, args.getNeighbourRadius());
 
         //calculate new acceleration
         Vec3 acceleration = calculateAcceleration();
@@ -263,7 +258,7 @@ public abstract class BaseSwarmObject extends BaseObject {
      * @param maximalDistance Maximum Distnace BaseSwarmObject <= will be returned
      * @return List of tupel with BaseSwarmObject and distance
      */
-    public List<Tuple<BaseSwarmObject, Float>> getNeighbours(float maximalDistance) {
+    private List<Tuple<BaseSwarmObject, Float>> getNeighbours(List<BaseSwarmObject> possibleNeighbours, float maximalDistance) {
         List<Tuple<BaseSwarmObject, Float>> n = new ArrayList<>();
 
         for (BaseSwarmObject b : swarm) {

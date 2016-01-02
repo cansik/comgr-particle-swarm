@@ -1,5 +1,6 @@
 package ch.comgr.particleswarm.controller;
 
+import ch.comgr.particleswarm.model.BaseSwarmObject;
 import ch.comgr.particleswarm.model.CollisionObject;
 import ch.comgr.particleswarm.model.ISimulationObject;
 import ch.comgr.particleswarm.model.Particle;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 /**
  * Created by cansik on 20/10/15.
@@ -38,7 +40,13 @@ public class SwarmSimulation extends JFrame {
     }
 
     private void createInitialSimulationObjects() {
-        controller.getScene().add3DObject(EtherGLUtil.createBox(new Vec3(100, 100, 100)).getFirst());
+        Vec3 boxVector = new Vec3(
+                swarmConfiguration.BoxWidth.getCurrentValue(),
+                swarmConfiguration.BoxHeight.getCurrentValue(),
+                swarmConfiguration.BoxDepth.getCurrentValue());
+
+        controller.getScene().add3DObject(EtherGLUtil.createBox(boxVector).getFirst());
+
         for (int i = 0; i < swarmConfiguration.NewNumberOfObjects.getCurrentValue(); i++) {
             //start at 50, 50, 50
             addSimulationObject(i);
@@ -83,9 +91,24 @@ public class SwarmSimulation extends JFrame {
      */
     private void updateSimulationObjects() {
         // create updateSimulationObjects event args
+        List<BaseSwarmObject> baseSwarmObjects = simulationObjects
+                .stream()
+                .filter(simulationObject -> simulationObject instanceof BaseSwarmObject)
+                .map(s -> (BaseSwarmObject) s)
+                .collect(Collectors.toList());
+
+        GridCoordination gridCoordination = new GridCoordination(
+                (int) swarmConfiguration.BoxWidth.getCurrentValue(),
+                (int) swarmConfiguration.BoxHeight.getCurrentValue(),
+                (int) swarmConfiguration.BoxDepth.getCurrentValue());
+
+        baseSwarmObjects.forEach(swarm -> gridCoordination.addMesh(swarm));
+
         UpdateEventArgs args = new UpdateEventArgs(swarmConfiguration,
                 new ArrayList<>(simulationObjects),
-                new ArrayList<>(collisionObjects));
+                new ArrayList<>(collisionObjects),
+                baseSwarmObjects,
+                gridCoordination);
 
         for (ISimulationObject o : simulationObjects) {
             o.update(args);

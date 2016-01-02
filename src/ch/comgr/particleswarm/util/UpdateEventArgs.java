@@ -1,5 +1,6 @@
 package ch.comgr.particleswarm.util;
 
+import ch.comgr.particleswarm.model.BaseSwarmObject;
 import ch.comgr.particleswarm.model.CollisionObject;
 import ch.comgr.particleswarm.model.ISimulationObject;
 
@@ -11,18 +12,26 @@ import java.util.List;
 public class UpdateEventArgs {
     private final List<ISimulationObject> simulationObjects;
     private final List<CollisionObject> collisionObjects;
-
-
     private final SwarmConfiguration configuration;
+    private final List<BaseSwarmObject> baseSwarmObjects;
+    private final GridCoordination gridCoordination;
 
     public UpdateEventArgs(SwarmConfiguration configuration,
                            List<ISimulationObject> simulationObjects,
-                           List<CollisionObject> collisionObjects)
+                           List<CollisionObject> collisionObjects,
+                           List<BaseSwarmObject> baseSwarmObjects,
+                           GridCoordination gridCoordination)
     {
         this.configuration = configuration;
         this.simulationObjects = simulationObjects;
         this.collisionObjects = collisionObjects;
+        this.baseSwarmObjects = baseSwarmObjects;
+        this.gridCoordination = gridCoordination;
     }
+
+    public GridCoordination getGridCoordination() {return gridCoordination; }
+
+    public List<BaseSwarmObject> getBaseSwarmObjects() { return baseSwarmObjects; }
 
     public float getMaxSpeed() { return configuration.MaxSpeed.getCurrentValue();}
 

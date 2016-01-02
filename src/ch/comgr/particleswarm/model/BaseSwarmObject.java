@@ -18,14 +18,12 @@ import static ch.comgr.particleswarm.util.EtherGLUtil.equalVec3;
  * Created by cansik on 24/10/15.
  */
 public abstract class BaseSwarmObject extends BaseObject {
-
     private UpdateEventArgs args;
+    private List<BaseSwarmObject> swarm;
+    private List<Tuple<BaseSwarmObject, Float>> neighbours;
 
     float angle;
     Vec3 velocity;
-
-    private List<BaseSwarmObject> swarm;
-    private List<Tuple<BaseSwarmObject, Float>> neighbours;
 
     /**
      * Creates a new Swarm Object which try's to align to other objects.

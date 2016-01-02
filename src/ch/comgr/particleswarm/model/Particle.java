@@ -6,12 +6,14 @@ import ch.comgr.particleswarm.util.ObjectLoader;
 import ch.comgr.particleswarm.util.Tuple;
 import ch.comgr.particleswarm.util.UpdateEventArgs;
 import ch.fhnw.ether.scene.mesh.IMesh;
+import ch.fhnw.util.color.RGB;
 import ch.fhnw.util.color.RGBA;
 import ch.fhnw.util.math.Mat4;
 import ch.fhnw.util.math.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 
 /**
@@ -42,7 +44,7 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
         //getAndAddMeshesFromObj("bunny.obj");
 
         // get swarm object
-        IMesh mesh = EtherGLUtil.createSphere(size);
+        IMesh mesh = EtherGLUtil.createSphere(size, getRandomColor());
         mesh.setName(name);
         meshes.add(mesh);
 
@@ -55,6 +57,12 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
         // set bounding box
         setVertices(tuple.getSecond());
     }
+
+    private RGBA getRandomColor(){
+        Random rnd = new Random();
+        return new RGBA(rnd.nextFloat(), rnd.nextFloat(), rnd.nextFloat(), 1.0f );
+    }
+
 
     /**
      * Loads mesh from obj file.

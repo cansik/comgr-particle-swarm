@@ -66,8 +66,9 @@ public class SwarmSimulationController extends DefaultController {
 
         int xIndex = 0;
         addHorizontalButtonOnBottom(this, "Quit", KeyEvent.VK_ESCAPE, Color.BLUE, xIndex++, (button, v) -> System.exit(0));
-        addHorizontalButtonOnBottom(this, "New", KeyEvent.VK_N, Color.BLUE, xIndex++, (button, v) -> swarmSimulation.addNewCollisionObject());
-        addHorizontalButtonOnBottom(this, "New", KeyEvent.VK_D, Color.BLUE, xIndex++, (button, v) -> swarmSimulation.changeDebugMode());
+        addHorizontalButtonOnBottom(this, "Collision", KeyEvent.VK_N, Color.BLUE, xIndex++, (button, v) -> swarmSimulation.addNewCollisionObject());
+        addHorizontalButtonOnBottom(this, "Debug", KeyEvent.VK_D, Color.BLUE, xIndex++, (button, v) -> swarmSimulation.changeDebugMode());
+        addHorizontalButtonOnBottom(this, "Misc", KeyEvent.VK_D, Color.BLUE, xIndex++, (button, v) -> swarmSimulation.toggleMisc());
 
         int yIndex = 1;
         addSliderVertical(this, configuration.NewNumberOfObjects, yIndex++);

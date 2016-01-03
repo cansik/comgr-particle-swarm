@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  */
 public class Particle extends BaseSwarmObject implements ISimulationObject {
 
-    private List<IMesh> meshes = new ArrayList<>();
+    protected List<IMesh> meshes = new ArrayList<>();
 
     float size = 1f;
     float neighbourRadius = 5f;
@@ -44,16 +44,25 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
         //getAndAddMeshesFromObj("bunny.obj");
 
         // get swarm object
-        IMesh mesh = EtherGLUtil.createSphere(size, getRandomColor());
-        mesh.setName(name);
-        meshes.add(mesh);
-
-        // get swarm object bounding box
-        Tuple<IMesh, List<Vec3>> tuple = EtherGLUtil.createSphereBox(sizeVec3);
+        setupMesh(name);
 
         //init BaseSwarmObject
         setName(name);
         changePosition(startPos, velocity);
+
+        setupBoundingBox();
+    }
+
+    protected void setupMesh(String name){
+        IMesh mesh = EtherGLUtil.createSphere(size, getRandomColor());
+        mesh.setName(name);
+        meshes.add(mesh);
+    }
+
+    protected void setupBoundingBox(){
+        // get swarm object bounding box
+        Tuple<IMesh, List<Vec3>> tuple = EtherGLUtil.createSphereBox(sizeVec3);
+
         // set bounding box
         setVertices(tuple.getSecond());
     }

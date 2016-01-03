@@ -28,7 +28,7 @@ public class SwarmConfiguration
         public float getMaxValue() {return maxValue;}
     }
 
-    public final FloatProperty NewNumberOfObjects = new FloatProperty("Objects", Color.green, 15, 1000);
+    public final FloatProperty NewNumberOfObjects = new FloatProperty("Objects", Color.green, 3, 1000);
     public final FloatProperty NeighbourRadius = new FloatProperty("Radius", Color.red, 15.0f, 30f);
     public final FloatProperty Separation = new FloatProperty("Separation", Color.orange, 1.5f, 5f);
     public final FloatProperty Alignment = new FloatProperty("Alignment", Color.orange, 1.0f, 5f);
@@ -39,14 +39,15 @@ public class SwarmConfiguration
     public final FloatProperty BoxWidth = new FloatProperty("BoxWidth", 100f);
     public final FloatProperty BoxHeight = new FloatProperty("BoxHeight", 100f);
     public final FloatProperty BoxDepth = new FloatProperty("BoxDepth", 100f);
+    public final FloatProperty MiscObject = new FloatProperty("MiscObject", 2f);
 
     //TODO: RRA - Adding boolean Property (extracting FloatProperty-Class)
     public volatile boolean DebugMode = false;
     public volatile boolean ShowController = true;
 
     public final double LoopInterval = 0.5; // 1.0/60.0
-    public final float IncrementXy = 0.25f;
-    public final float IncrementZ = 0.25f;
+    public final float IncrementXy = 5f;
+    public final float IncrementZ = 5f;
     public final int ScreenPositionX = 10;
     public final int ScreenPositionY = 40;
     public final int ScreenWidth = 1024;

@@ -2,14 +2,13 @@ package ch.comgr.particleswarm.controller;
 
 import ch.comgr.particleswarm.model.CollisionObject;
 import ch.comgr.particleswarm.model.ISimulationObject;
+import ch.comgr.particleswarm.model.MiscObject;
 import ch.comgr.particleswarm.model.Particle;
 import ch.comgr.particleswarm.util.*;
 import ch.fhnw.ether.scene.mesh.IMesh;
 import ch.fhnw.util.math.Vec3;
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -99,12 +98,36 @@ public class SwarmSimulation extends JFrame {
         CollisionObject object = new CollisionObject(distr.add(startVec), "Collision object", this);
         collisionObjects.add(object);
         simulationObjects.add(object);
+        addISimulationObjectMeshes(object);
+        swarmStatistics.NumOfObjects++;
+    }
 
-        for (IMesh m : object.getMeshes()) {
+    private void addISimulationObjectMeshes(ISimulationObject simulationObject){
+        for (IMesh m : simulationObject.getMeshes()) {
             controller.getScene().add3DObject(m);
             swarmStatistics.NumOfMeshes++;
         }
-        swarmStatistics.NumOfObjects++;
+    }
+
+    private void removeISimulationObjectMeshes(ISimulationObject simulationObject){
+        for (IMesh m : simulationObject.getMeshes()) {
+            controller.getScene().remove3DObject(m);
+            swarmStatistics.NumOfMeshes--;
+        }
+    }
+
+    private MiscObject miscObject = null;
+    public void toggleMisc(){
+        if(miscObject == null){
+            miscObject = new MiscObject(new Vec3(50,50,50), "Misc Object", this);
+            simulationObjects.add(miscObject);
+            addISimulationObjectMeshes(miscObject);
+        }
+        else{
+            simulationObjects.remove(miscObject);
+            removeISimulationObjectMeshes(miscObject);
+            miscObject = null;
+        }
     }
 
     public void changeDebugMode() {
@@ -134,11 +157,7 @@ public class SwarmSimulation extends JFrame {
 
         Particle particle = new Particle(distr.add(startVec), "Gen (" + (int) name + ")", this);
         simulationObjects.add(particle);
-
-        for (IMesh m : particle.getMeshes()) {
-            controller.getScene().add3DObject(m);
-            swarmStatistics.NumOfMeshes++;
-        }
+        addISimulationObjectMeshes(particle);
     }
 
     private void removeSimulationObjects(float number) {
@@ -147,11 +166,7 @@ public class SwarmSimulation extends JFrame {
 
             ISimulationObject o = simulationObjects.get(index);
             simulationObjects.remove(o);
-
-            for (IMesh m : o.getMeshes()) {
-                controller.getScene().remove3DObject(m);
-                swarmStatistics.NumOfMeshes--;
-            }
+            removeISimulationObjectMeshes(o);
         }
 
         swarmStatistics.NumOfObjects -= number;

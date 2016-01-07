@@ -117,6 +117,16 @@ public class Particle extends BaseSwarmObject implements ISimulationObject {
 
     private void checkCollision(List<CollisionObject> collisionObjects) {
         for(CollisionObject obj : collisionObjects) {
+
+//            float cx = max(min(p.x, location.x+size.x), location.x);
+//            float cy = max(min(p.y, location.y+size.y), location.y);
+//
+//            return new PVector(cx, cy);
+
+            Logger.getLogger("Nearest").info("Near"+obj.calcNearestVec(getPosition()).toString());
+            Logger.getLogger("position").info("pos"+getPosition().toString());
+
+
             if(obj.getBounds().intersects(getBounds())) {
                 Logger.getLogger("Collision").info("Collision detected");
                 /**

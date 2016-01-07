@@ -44,6 +44,14 @@ public class CollisionObject extends BaseObject implements ISimulationObject{
         });
     }
 
+    public Vec3 calcNearestVec(Vec3 point) {
+        float cx = Math.max(Math.min(point.x, getPosition().x + size.x), getPosition().x);
+        float cy = Math.max(Math.min(point.y, getPosition().y + size.y), getPosition().y);
+        float cz = Math.max(Math.min(point.z, getPosition().z + size.z), getPosition().z);
+
+        return new Vec3(cx,cy,cz);
+    }
+
     private void setOrRemoveBoundingBoxMesh(boolean debugMode) {
         // create bounding box
         IMesh boundingBox = meshes.get(meshes.size() - 1);

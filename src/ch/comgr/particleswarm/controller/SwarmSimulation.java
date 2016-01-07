@@ -10,6 +10,7 @@ import ch.fhnw.util.math.Vec3;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Logger;
 
 /**
  * Created by cansik on 20/10/15.
@@ -60,7 +61,8 @@ public class SwarmSimulation extends JFrame {
         swarmStatistics.FpsCounter.count();
         controller.getInformationCollectorWidget().setFps(swarmStatistics.FpsCounter.getFps());
         controller.getInformationCollectorWidget().setMeshesCounter(swarmStatistics.NumOfMeshes);
-        controller.getInformationCollectorWidget().setObjectsCounter((int) swarmStatistics.NumOfObjects);
+        float objectCounter = swarmStatistics.NumOfObjects + collisionObjects.size() + (miscObject == null ? 0 : 1);
+        controller.getInformationCollectorWidget().setObjectsCounter((int) objectCounter);
         controller.getUI().updateRequest();
     }
 
@@ -99,7 +101,6 @@ public class SwarmSimulation extends JFrame {
         collisionObjects.add(object);
         simulationObjects.add(object);
         addISimulationObjectMeshes(object);
-        swarmStatistics.NumOfObjects++;
     }
 
     private void addISimulationObjectMeshes(ISimulationObject simulationObject){
@@ -161,7 +162,7 @@ public class SwarmSimulation extends JFrame {
     }
 
     private void removeSimulationObjects(float number) {
-        for(int i = 1; i < number + 1; i++) {
+        for(int i = 0; i < number; i++) {
             int index = (int) swarmStatistics.NumOfObjects - i;
 
             ISimulationObject o = simulationObjects.get(index);

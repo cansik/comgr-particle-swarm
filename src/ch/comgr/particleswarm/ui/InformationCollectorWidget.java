@@ -35,11 +35,11 @@ public class InformationCollectorWidget extends ch.fhnw.ether.ui.AbstractWidget 
         plane.drawString("Meshes: " + this.meshesCounter, getX() + 180, getY() - 20 - dh);
         plane.drawString("Objects: " + this.objectsCounter, getX() + 180, getY() - 40 - dh);
 
-        plane.drawString("[D] debug mode", getX() + dw, getY() + 90);
-        plane.drawString("[R] reset camera location", getX() + dw, getY() + 110);
-        plane.drawString("[N] add new Collision Object", getX() + dw, getY() + 130);
-        plane.drawString("[A/Q] change camera up and down (no rotation)", getX() + dw, getY() + 150);
-        plane.drawString("[up/down/left/right] change camera (with rotation)" , getX() + dw, getY() + 170);
+        plane.drawString("[D] debug mode", getX() + dw, getY() + 60);
+        plane.drawString("[R] reset camera location", getX() + dw, getY() + 80);
+        plane.drawString("[N] add new Collision Object", getX() + dw, getY() + 100);
+        plane.drawString("[A/Q] change camera up and down (no rotation)", getX() + dw, getY() + 120);
+        plane.drawString("[up/down/left/right] change camera (with rotation)" , getX() + dw, getY() + 140);
     }
 
     @Override
